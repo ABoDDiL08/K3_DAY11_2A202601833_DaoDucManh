@@ -201,7 +201,7 @@
         </div>
         <div style="grid-column:span 2;background:#1f3d2f;color:#f4f1e9;border-radius:1.8vmin;padding:1.8vmin 1.4vmin;text-align:center;display:flex;flex-direction:column;justify-content:center;">
           <div style="font-size:1.8vmin;font-weight:800;letter-spacing:.16em;color:#a7c4b2;">TỔNG</div>
-          <div style="font-size:2.6vmin;font-weight:900;margin-top:.4vmin;">150 phút · 2 deliverables</div>
+          <div style="font-size:2.6vmin;font-weight:900;margin-top:.4vmin;">150' · Tấn công 20% + Phòng thủ 80%</div>
         </div>
       </div>
     </div>
@@ -430,7 +430,7 @@
           <div class="t-num">30:00</div>
           <div class="t-btns"><button class="t-start">START</button><button class="t-reset">RESET</button></div>
         </div>
-        <div class="pill" style="align-self:stretch;justify-content:center;text-align:center;">📄 Đây là <b>Deliverable #1</b>: Security Report</div>
+        <div class="pill" style="align-self:stretch;justify-content:center;text-align:center;">Dùng cho hạng mục <b>Phòng thủ (80%)</b> — so sánh before/after</div>
       </div>
     </div>
   </section>
@@ -459,7 +459,7 @@
           <div class="t-num">30:00</div>
           <div class="t-btns"><button class="t-start">START</button><button class="t-reset">RESET</button></div>
         </div>
-        <div class="pill" style="align-self:stretch;justify-content:center;text-align:center;">📊 Deliverable #2: HITL Flowchart</div>
+        <div class="pill" style="align-self:stretch;justify-content:center;text-align:center;">HITL hỗ trợ tư duy Phòng thủ — nộp theo đề Assignment</div>
       </div>
     </div>
   </section>
@@ -469,30 +469,30 @@
     <div class="head">
       <div>
         <div class="h1">CHECKLIST TRƯỚC KHI NỘP</div>
-        <div class="sub">Đủ 2 deliverable thì Lab 11 mới được tính hoàn thành</div>
+        <div class="sub"><b>Tấn công 20%</b> + <b>Phòng thủ 80%</b> · xem SUBMISSION.md</div>
       </div>
     </div>
     <div style="flex:1;min-height:0;display:flex;gap:2.4vmin;margin-top:2.4vmin;">
-      <div style="flex:1;background:#fff;border:.4vmin solid #cfe0d5;border-radius:2.4vmin;padding:2.6vmin;">
-        <h4 style="margin:0 0 1.6vmin;font-size:2.3vmin;color:#2e6f4f;">📄 Security Report</h4>
-        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>Before/after cho <b>≥5 attack</b> (ADK + NeMo)</span></div>
-        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>Lỗ hổng nghiêm trọng nhất + guardrail hiệu quả nhất</span></div>
-        <div class="li" style="font-size:2.1vmin;"><span class="dot">☐</span><span>Residual risks còn tồn đọng</span></div>
-      </div>
       <div style="flex:1;background:#fff;border:.4vmin solid #e5b691;border-radius:2.4vmin;padding:2.6vmin;">
-        <h4 style="margin:0 0 1.6vmin;font-size:2.3vmin;color:#a8531f;">📊 HITL Flowchart</h4>
-        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span><b>3 decision points</b> rõ trigger + hitl_model</span></div>
-        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>Escalation path gắn với <code>ConfidenceRouter</code></span></div>
-        <div class="li" style="font-size:2.1vmin;"><span class="dot">☐</span><span>Context cần thiết cho người review ở mỗi điểm</span></div>
+        <h4 style="margin:0 0 1.6vmin;font-size:2.3vmin;color:#a8531f;">⚔️ A. Tấn công — 20%</h4>
+        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>≥5 prompt tấn công nâng cao</span></div>
+        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>AI red team ≥5 attack mới</span></div>
+        <div class="li" style="font-size:2.1vmin;"><span class="dot">☐</span><span><code>outputs/attack_results.json</code> + output notebook</span></div>
+      </div>
+      <div style="flex:1.2;background:#fff;border:.4vmin solid #cfe0d5;border-radius:2.4vmin;padding:2.6vmin;">
+        <h4 style="margin:0 0 1.6vmin;font-size:2.3vmin;color:#2e6f4f;">🛡️ B. Phòng thủ — 80%</h4>
+        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>Pipeline: rate limit + input/output + judge + audit</span></div>
+        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>Test 1–4 + <code>results.json</code> / audit / metrics</span></div>
+        <div class="li" style="font-size:2.1vmin;"><span class="dot">☐</span><span>Báo cáo 1–2 trang (5 câu hỏi)</span></div>
       </div>
       <div style="flex:.9;background:#1f3d2f;color:#f4f1e9;border-radius:2.4vmin;padding:2.6vmin;">
-        <div style="font-size:1.9vmin;letter-spacing:.28em;text-transform:uppercase;color:#a7c4b2;font-weight:700;margin-bottom:1.4vmin;">Sau Lab 11</div>
-        <div style="font-size:2.2vmin;font-weight:800;">Assignment 11</div>
-        <p style="font-size:1.9vmin;color:#cfe0d5;font-weight:600;margin-top:1vmin;line-height:1.4;">Production defense-in-depth pipeline · ≥4 lớp độc lập + audit/monitoring · nộp <code>.ipynb</code> + report 1–2 trang</p>
-        <div style="font-size:1.9vmin;color:#8ee0a6;font-weight:800;margin-top:1.4vmin;">Hạn: cuối Tuần 11</div>
+        <div style="font-size:1.9vmin;letter-spacing:.28em;text-transform:uppercase;color:#a7c4b2;font-weight:700;margin-bottom:1.4vmin;">Nộp bài</div>
+        <div style="font-size:2.2vmin;font-weight:800;">Cá nhân · 1 MSSV</div>
+        <p style="font-size:1.9vmin;color:#cfe0d5;font-weight:600;margin-top:1vmin;line-height:1.4;">Xem <code>SUBMISSION.md</code> + <code>assignment11_defense_pipeline.md</code></p>
+        <div style="font-size:1.9vmin;color:#8ee0a6;font-weight:800;margin-top:1.4vmin;">Hạn: CN Tuần 11, 23:59 ICT</div>
       </div>
     </div>
-    <div class="pill" style="margin-top:2.4vmin;">📩 Nộp theo hướng dẫn của Lab Coach</div>
+    <div class="pill" style="margin-top:2.4vmin;">📩 Điểm cuối = min(A + B + thưởng, 100)</div>
   </section>
 
   <!-- 13 — BONUS ARENA -->
@@ -503,16 +503,15 @@
     </div>
     <div class="body">
       <div class="main">
-        <div style="font-size:2.8vmin;font-weight:700;color:#2e6f4f;">Notebook riêng: <code>attack_defense_arena.ipynb</code></div>
-        <div class="li"><span class="dot">•</span><span>Chơi theo cặp: một bên <b>Attacker</b> viết prompt tấn công, một bên <b>Defender</b> vá guardrail để chặn</span></div>
-        <div class="li"><span class="dot">•</span><span>Có Attack Log + Scoreboard để theo dõi ai đang thắng qua từng vòng</span></div>
-        <div class="li"><span class="dot">•</span><span>Có sẵn UI Gradio để chơi trực tiếp trong lớp</span></div>
-        <div class="pill">🎮 Không bắt buộc — dùng để ôn tập sau khi xong 13 TODO chính, hoặc làm hoạt động tổng kết cuối buổi</div>
+        <div style="font-size:2.8vmin;font-weight:700;color:#2e6f4f;">Không còn mini-game Arena riêng</div>
+        <div class="li"><span class="dot">•</span><span><b>Tấn công (20%)</b> = Part 1 / <code>src/attacks/</code></span></div>
+        <div class="li"><span class="dot">•</span><span><b>Phòng thủ (80%)</b> = pipeline nhiều lớp</span></div>
+        <div class="pill">📩 Nộp theo SUBMISSION.md — cả A và B</div>
       </div>
       <div class="side">
         <div class="card">
-          <h4>Gợi ý sử dụng</h4>
-          <p>Chia lớp thành 2 đội thi "tấn công vs phòng thủ" trực tiếp trong 10–15 phút cuối, nếu còn thời gian.</p>
+          <h4>Ưu tiên trên lớp</h4>
+          <p>Làm xong hạng mục Tấn công trước, rồi chuyển sang xây pipeline Phòng thủ.</p>
         </div>
       </div>
     </div>
