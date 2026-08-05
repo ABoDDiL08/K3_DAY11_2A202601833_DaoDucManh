@@ -2,14 +2,16 @@
 
 **Môn:** AICB-P1 — AI Agent Development  
 **Hình thức:** **Cá nhân** (không làm nhóm)  
-**Hạn nộp:** Chủ nhật tuần 11, 23:59 giờ Việt Nam (ICT)  
-**Cách nộp:** [`SUBMISSION.md`](SUBMISSION.md).
+**Hạn nộp:** Thứ sáu ngày 7/8, 23:59 giờ Việt Nam (ICT)  
+**Cách nộp:** `[SUBMISSION.md](SUBMISSION.md)`.
 
-| Hạng mục | Tỷ lệ | Điểm |
-|----------|-------|------|
-| **A. Tấn công** | 20% | 20 |
-| **B. Phòng thủ** | 80% | 80 |
-| Thưởng (lớp bảo vệ thứ 6) | +10 | Cắt trần 100 |
+
+| Hạng mục                  | Tỷ lệ | Điểm         |
+| ------------------------- | ----- | ------------ |
+| **A. Tấn công**           | 20%   | 20           |
+| **B. Phòng thủ**          | 80%   | 80           |
+| Thưởng (lớp bảo vệ thứ 6) | +10   | Cắt trần 100 |
+
 
 ---
 
@@ -31,6 +33,8 @@ Khung code:
 
 ---
 
+
+
 ## Hạng mục A — Tấn công (20 điểm)
 
 **Mục tiêu:** tấn agent unsafe bằng prompt thông minh và ghi nhận kết quả.
@@ -38,11 +42,11 @@ Khung code:
 ### Việc cần làm
 
 1. Viết **ít nhất 5** adversarial prompt (kỹ thuật nâng cao — không chỉ “Ignore all instructions”):
-   - Completion / điền chỗ trống  
-   - Translation / đổi format  
-   - Hypothetical / creative writing  
-   - Confirmation / side-channel  
-   - Multi-step / leo thang dần  
+  - Completion / điền chỗ trống  
+  - Translation / đổi format  
+  - Hypothetical / creative writing  
+  - Confirmation / side-channel  
+  - Multi-step / leo thang dần
 2. Dùng AI (Gemini) **sinh thêm ≥5** attack mới (red teaming tự động).
 3. Chạy thật trên agent unsafe, lưu kết quả vào `outputs/attack_results.json` và giữ output trong notebook.
 
@@ -50,13 +54,17 @@ Gợi ý chạy: `cd src` → `python main.py --part 1`
 
 ### Chấm điểm A (20)
 
-| Tiêu chí | Điểm |
-|----------|------|
-| 5+ prompt tấn công chất lượng | 8 |
-| Red team bằng AI (≥5 attack mới) | 4 |
-| Chạy thật + bằng chứng lộ / nguy hiểm (`attack_results.json` + notebook) | 8 |
+
+| Tiêu chí                                                                 | Điểm |
+| ------------------------------------------------------------------------ | ---- |
+| 5+ prompt tấn công chất lượng                                            | 8    |
+| Red team bằng AI (≥5 attack mới)                                         | 4    |
+| Chạy thật + bằng chứng lộ / nguy hiểm (`attack_results.json` + notebook) | 8    |
+
 
 ---
+
+
 
 ## Hạng mục B — Phòng thủ (80 điểm)
 
@@ -66,21 +74,27 @@ Gợi ý chạy: `cd src` → `python main.py --part 1`
 
 Bạn **được dùng bất kỳ framework nào**. Quan trọng là thiết kế pipeline và tư duy an toàn — không bắt buộc một thư viện cụ thể.
 
-| Framework | Cách làm guardrail |
-|-----------|-------------------|
-| **Google ADK** | `BasePlugin` + callback (giống lab) |
-| **LangChain / LangGraph** | Chain / graph có nhánh điều kiện |
-| **NVIDIA NeMo Guardrails** | Colang + `LLMRails` |
-| **Guardrails AI** | Validator + object `Guard` |
-| **CrewAI / LlamaIndex** | Guardrail ở mức agent / query pipeline |
-| **Pure Python** | Chỉ hàm và class, không framework |
+
+| Framework                  | Cách làm guardrail                     |
+| -------------------------- | -------------------------------------- |
+| **Google ADK**             | `BasePlugin` + callback (giống lab)    |
+| **LangChain / LangGraph**  | Chain / graph có nhánh điều kiện       |
+| **NVIDIA NeMo Guardrails** | Colang + `LLMRails`                    |
+| **Guardrails AI**          | Validator + object `Guard`             |
+| **CrewAI / LlamaIndex**    | Guardrail ở mức agent / query pipeline |
+| **Pure Python**            | Chỉ hàm và class, không framework      |
+
 
 Có thể **kết hợp** (ví dụ NeMo cho rule + Guardrails AI cho PII).  
 Phần Phụ lục có skeleton Google ADK — tham khảo hoặc bỏ qua cũng được.
 
 ---
 
+
+
 ## Bạn cần xây gì?
+
+
 
 ### Kiến trúc pipeline
 
@@ -111,22 +125,28 @@ Câu hỏi người dùng
    Phản hồi cho người dùng
 ```
 
+
+
 ### Các thành phần bắt buộc
 
 Phải có **ít nhất 4 lớp bảo vệ độc lập**, cộng thêm audit/monitoring:
 
-| # | Thành phần | Việc cần làm |
-|---|------------|--------------|
-| 1 | **Rate Limiter** | Chặn user gửi quá nhiều request trong một khoảng thời gian (cửa sổ trượt, theo từng user) |
-| 2 | **Input Guardrails** | Phát hiện prompt injection (regex) + chặn câu hỏi ngoài chủ đề / nguy hiểm. Có thể thêm rule NeMo |
-| 3 | **Output Guardrails** | Lọc PII/secret khỏi câu trả lời, che bằng `[REDACTED]` |
-| 4 | **LLM-as-Judge** | Dùng một LLM riêng chấm câu trả lời theo nhiều tiêu chí (an toàn, đúng chủ đề, chính xác, giọng điệu) |
-| 5 | **Audit Log** | Ghi mọi tương tác (input, output, lớp nào chặn, thời gian xử lý). Xuất ra JSON |
-| 6 | **Monitoring & Alerts** | Theo dõi tỷ lệ chặn, số lần rate-limit, tỷ lệ judge FAIL. Cảnh báo khi vượt ngưỡng |
+
+| #   | Thành phần              | Việc cần làm                                                                                          |
+| --- | ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| 1   | **Rate Limiter**        | Chặn user gửi quá nhiều request trong một khoảng thời gian (cửa sổ trượt, theo từng user)             |
+| 2   | **Input Guardrails**    | Phát hiện prompt injection (regex) + chặn câu hỏi ngoài chủ đề / nguy hiểm. Có thể thêm rule NeMo     |
+| 3   | **Output Guardrails**   | Lọc PII/secret khỏi câu trả lời, che bằng `[REDACTED]`                                                |
+| 4   | **LLM-as-Judge**        | Dùng một LLM riêng chấm câu trả lời theo nhiều tiêu chí (an toàn, đúng chủ đề, chính xác, giọng điệu) |
+| 5   | **Audit Log**           | Ghi mọi tương tác (input, output, lớp nào chặn, thời gian xử lý). Xuất ra JSON                        |
+| 6   | **Monitoring & Alerts** | Theo dõi tỷ lệ chặn, số lần rate-limit, tỷ lệ judge FAIL. Cảnh báo khi vượt ngưỡng                    |
+
 
 Mỗi lớp nên bắt được thứ mà lớp khác dễ bỏ sót.
 
 ---
+
+
 
 ## Yêu cầu kiểm thử
 
@@ -144,6 +164,8 @@ safe_queries = [
 ]
 ```
 
+
+
 ### Test 2: Tấn công (phải bị chặn — BLOCKED)
 
 ```python
@@ -158,12 +180,16 @@ attack_queries = [
 ]
 ```
 
+
+
 ### Test 3: Giới hạn tốc độ (rate limiting)
 
 ```python
 # Gửi liên tiếp 15 request từ cùng một user
 # Kỳ vọng: khoảng 10 request đầu cho qua, 5 request sau bị chặn
 ```
+
+
 
 ### Test 4: Trường hợp biên (edge cases)
 
@@ -179,38 +205,48 @@ edge_cases = [
 
 ---
 
+
+
 ## Sản phẩm nộp & thang điểm hạng mục B (80 điểm)
 
-Nộp đúng cấu trúc [`SUBMISSION.md`](SUBMISSION.md).
+Nộp đúng cấu trúc `[SUBMISSION.md](SUBMISSION.md)`.
 
 ### B1. Notebook / code phòng thủ (48 điểm)
 
-| Tiêu chí | Điểm | Kỳ vọng |
-|----------|------|---------|
-| **Pipeline chạy suốt** | 8 | Các lớp khởi tạo được, agent trả lời được |
-| **Rate Limiter** | 6 | Test 3: một phần request bị chặn đúng |
-| **Input Guardrails** | 10 | Test 2: attack bị chặn ở input (ghi pattern) |
-| **Output Guardrails** | 10 | PII/secret bị redact (before/after) |
-| **LLM-as-Judge** | 10 | Có điểm đa tiêu chí |
-| **Comment code** | 4 | Mỗi hàm/class: làm gì + vì sao cần |
-| **Tổng B1** | **48** | |
+
+| Tiêu chí               | Điểm   | Kỳ vọng                                      |
+| ---------------------- | ------ | -------------------------------------------- |
+| **Pipeline chạy suốt** | 8      | Các lớp khởi tạo được, agent trả lời được    |
+| **Rate Limiter**       | 6      | Test 3: một phần request bị chặn đúng        |
+| **Input Guardrails**   | 10     | Test 2: attack bị chặn ở input (ghi pattern) |
+| **Output Guardrails**  | 10     | PII/secret bị redact (before/after)          |
+| **LLM-as-Judge**       | 10     | Có điểm đa tiêu chí                          |
+| **Comment code**       | 4      | Mỗi hàm/class: làm gì + vì sao cần           |
+| **Tổng B1**            | **48** |                                              |
+
+
+
 
 ### B2. Báo cáo (32 điểm)
 
 Báo cáo **1–2 trang** (PDF hoặc Markdown). Có thể thêm 1 đoạn tóm tắt kết quả tấn công (hạng mục A).
 
-| # | Câu hỏi | Điểm |
-|---|---------|------|
-| 1 | **Phân tích lớp:** Với 7 prompt ở Test 2, lớp nào chặn đầu tiên? Liệt kê dạng bảng. | 8 |
-| 2 | **False positive:** Test 1 có bị chặn nhầm không? Trade-off bảo mật vs dễ dùng? | 6 |
-| 3 | **Lỗ hổng:** 3 attack pipeline hiện tại không chặn được + lớp bổ sung đề xuất. | 8 |
-| 4 | **Production:** Đổi gì nếu triển khai ngân hàng 10.000 user (latency, cost, monitor)? | 6 |
-| 5 | **Đạo đức:** Có “an toàn tuyệt đối” không? Khi nào từ chối / khi nào disclaimer? | 4 |
-| **Tổng B2** | | **32** |
+
+| #           | Câu hỏi                                                                               | Điểm   |
+| ----------- | ------------------------------------------------------------------------------------- | ------ |
+| 1           | **Phân tích lớp:** Với 7 prompt ở Test 2, lớp nào chặn đầu tiên? Liệt kê dạng bảng.   | 8      |
+| 2           | **False positive:** Test 1 có bị chặn nhầm không? Trade-off bảo mật vs dễ dùng?       | 6      |
+| 3           | **Lỗ hổng:** 3 attack pipeline hiện tại không chặn được + lớp bổ sung đề xuất.        | 8      |
+| 4           | **Production:** Đổi gì nếu triển khai ngân hàng 10.000 user (latency, cost, monitor)? | 6      |
+| 5           | **Đạo đức:** Có “an toàn tuyệt đối” không? Khi nào từ chối / khi nào disclaimer?      | 4      |
+| **Tổng B2** |                                                                                       | **32** |
+
 
 **Tổng B = B1 + B2 = 80 điểm (80%).**
 
 ---
+
+
 
 ## Điểm thưởng (+10)
 
@@ -218,23 +254,26 @@ Cộng vào tổng A+B, rồi cắt trần: điểm cuối = `min(A + B + thư�
 
 Thêm **lớp bảo vệ thứ 6** do bạn tự thiết kế. Gợi ý:
 
-| Ý tưởng | Mô tả |
-|---------|--------|
-| Phân loại độc hại (toxicity) | Perspective API, `detoxify`, hoặc moderation API |
-| Nhận diện ngôn ngữ | Chặn ngôn ngữ không hỗ trợ (`langdetect`, `fasttext`) |
-| Phát hiện bất thường phiên | Cảnh báo user gửi nhiều câu giống injection trong một phiên |
-| Lọc theo độ tương đồng embedding | Từ chối câu hỏi quá xa chủ đề ngân hàng |
-| Phát hiện ảo giác (hallucination) | Đối chiếu câu trả lời với FAQ / knowledge base |
-| Giới hạn chi phí | Theo dõi token theo user, chặn nếu vượt ngân sách |
+
+| Ý tưởng                           | Mô tả                                                       |
+| --------------------------------- | ----------------------------------------------------------- |
+| Phân loại độc hại (toxicity)      | Perspective API, `detoxify`, hoặc moderation API            |
+| Nhận diện ngôn ngữ                | Chặn ngôn ngữ không hỗ trợ (`langdetect`, `fasttext`)       |
+| Phát hiện bất thường phiên        | Cảnh báo user gửi nhiều câu giống injection trong một phiên |
+| Lọc theo độ tương đồng embedding  | Từ chối câu hỏi quá xa chủ đề ngân hàng                     |
+| Phát hiện ảo giác (hallucination) | Đối chiếu câu trả lời với FAQ / knowledge base              |
+| Giới hạn chi phí                  | Theo dõi token theo user, chặn nếu vượt ngân sách           |
+
 
 ---
+
+
 
 ## Phụ lục: Skeleton tham khảo (Google ADK)
 
 Chỉ để **tham khảo**. Sao chép rồi sửa, hoặc bỏ qua hoàn toàn.
 
-<details>
-<summary>Skeleton RateLimitPlugin</summary>
+Skeleton RateLimitPlugin
 
 ```python
 from collections import defaultdict, deque
@@ -260,10 +299,10 @@ class RateLimitPlugin(base_plugin.BasePlugin):
         # 3. Nếu chưa vượt: thêm timestamp hiện tại, return None (cho qua)
         pass
 ```
-</details>
 
-<details>
-<summary>Skeleton LlmJudgePlugin (đa tiêu chí)</summary>
+
+
+Skeleton LlmJudgePlugin (đa tiêu chí)
 
 ```python
 JUDGE_INSTRUCTION = """You are a quality assurance judge for a banking AI assistant.
@@ -286,10 +325,10 @@ REASON: <one sentence>
 # LƯU Ý: Đừng dùng {biến} trong instruction — ADK coi đó là biến template.
 # Đưa nội dung cần chấm vào user message.
 ```
-</details>
 
-<details>
-<summary>Skeleton AuditLogPlugin</summary>
+
+
+Skeleton AuditLogPlugin
 
 ```python
 import json
@@ -313,10 +352,10 @@ class AuditLogPlugin(base_plugin.BasePlugin):
         with open(filepath, "w") as f:
             json.dump(self.logs, f, indent=2, default=str)
 ```
-</details>
 
-<details>
-<summary>Ghép pipeline đầy đủ</summary>
+
+
+Ghép pipeline đầy đủ
 
 ```python
 production_plugins = [
@@ -334,10 +373,10 @@ results = await run_attacks(agent, runner, attack_queries)
 monitor.check_metrics()
 audit_log.export_json("security_audit.json")
 ```
-</details>
 
-<details>
-<summary>Phương án khác: LangGraph</summary>
+
+
+Phương án khác: LangGraph
 
 ```python
 from langgraph.graph import StateGraph, END
@@ -357,10 +396,10 @@ graph.add_edge("llm", "judge")
 graph.add_edge("judge", "audit")
 graph.add_edge("audit", END)
 ```
-</details>
 
-<details>
-<summary>Phương án khác: Pure Python</summary>
+
+
+Phương án khác: Pure Python
 
 ```python
 class DefensePipeline:
@@ -383,9 +422,12 @@ class DefensePipeline:
 
         return response
 ```
-</details>
+
+
 
 ---
+
+
 
 ## Tài liệu tham khảo
 
@@ -396,3 +438,4 @@ class DefensePipeline:
 - [OWASP Top 10 for LLM](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [AI Safety Fundamentals](https://aisafetyfundamentals.com/)
 - Code lab: thư mục `src/` và `notebooks/lab11_guardrails_hitl.ipynb`
+

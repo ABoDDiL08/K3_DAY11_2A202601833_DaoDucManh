@@ -20,7 +20,7 @@ Bài Day 11 **làm một mình**, gồm 2 hạng mục:
 
 ## Hạn nộp
 
-**Chủ nhật tuần 11, 23:59 giờ Việt Nam (ICT, UTC+7).**
+**Thứ sáu 7/8, 23:59 giờ Việt Nam (ICT, UTC+7).**
 
 | Trễ | Phạt |
 |-----|------|

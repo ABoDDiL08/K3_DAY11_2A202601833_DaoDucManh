@@ -15,7 +15,7 @@ Làm sao để ứng dụng agent an toàn hơn?
 
 Điểm thưởng (tùy chọn): thêm lớp bảo vệ thứ 6 — tối đa **+10** (điểm cuối không vượt 100).
 
-**Hạn nộp:** Chủ nhật tuần 11, **23:59 giờ Việt Nam (ICT)**.
+**Hạn nộp:** Thứ sáu **7/8**, **23:59 giờ Việt Nam (ICT)**.
 
 | Tài liệu | Dùng để |
 |----------|---------|
