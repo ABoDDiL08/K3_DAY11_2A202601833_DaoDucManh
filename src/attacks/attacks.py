@@ -170,7 +170,7 @@ async def generate_ai_attacks() -> list:
     """Use Gemini to generate adversarial prompts automatically."""
     client = genai.Client()
     response = client.models.generate_content(
-        model="gemini-2.5-flash-lite",
+        model="gemini-3.1-flash-lite",
         contents=RED_TEAM_PROMPT,
     )
 

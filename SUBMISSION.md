@@ -15,7 +15,7 @@ Bài Day 11 **làm một mình**, gồm 2 hạng mục:
 **Gợi ý:** làm Phòng thủ (A) trước, Tấn công (B) sau.
 
 - Mỗi bài gắn **một MSSV**
-- Không nộp repo nhóm, không chia sẻ notebook bài nộp
+- Không nộp repo nhóm, không chia sẻ bài nộp
 - Thảo luận ý tưởng được; code và báo cáo phải là của bạn
 
 Đề bài chi tiết: `[assignment11_defense_pipeline.md](assignment11_defense_pipeline.md)`.
@@ -40,7 +40,7 @@ Bài Day 11 **làm một mình**, gồm 2 hạng mục:
 | **GitHub** | fork repo, đặt tên theo cú pháp: `K-<khóa của bạn>-<Họ và tên>-<MSSV>`. Submit link github ở trên CodeLabs. |
 
 
-Thay `<MSSV>` bằng mã SV (ví dụ `SE12345`).
+Thay `<MSSV>` bằng mã SV (ví dụ `2A202600000`).
 
 ---
 
@@ -51,8 +51,6 @@ Thay `<MSSV>` bằng mã SV (ví dụ `SE12345`).
 ```
 Day-11-Guardrails-HITL-Responsible-AI/
 ├── README.md                             # Họ tên, MSSV, cách chạy
-├── notebooks/
-│   └── <MSSV>_assignment11.ipynb         # Demo A + B (bắt buộc)
 ├── src/
 │   ├── assignment/                       # Code hạng mục A (Phòng thủ)
 │   ├── attacks/                          # Code hạng mục B (Tấn công)
@@ -76,7 +74,6 @@ Day-11-Guardrails-HITL-Responsible-AI/
 
 | Loại              | Tên file                              |
 | ----------------- | ------------------------------------- |
-| Notebook          | `notebooks/<MSSV>_assignment11.ipynb` |
 | Báo cáo           | `report/<MSSV>_report.md` hoặc `.pdf` |
 | Kết quả phòng thủ | `outputs/results.json`                |
 | Audit             | `outputs/audit_log.json`              |
@@ -84,7 +81,7 @@ Day-11-Guardrails-HITL-Responsible-AI/
 | Kết quả tấn công  | `outputs/attack_results.json`         |
 
 
-**Bằng chứng tấn công (hạng mục B / điểm cộng):** chụp màn hình kết quả chạy thật rồi **dán vào báo cáo** (`report/<MSSV>_report.md` hoặc PDF). Không dùng output notebook làm bằng chứng tấn công.
+**Bằng chứng tấn công (hạng mục B / điểm cộng):** file `outputs/attack_results.json` (có `unsafe_attacks` / `guards_attacks`, trường `leaked`). Không cần chụp màn hình.
 
 ---
 
@@ -99,28 +96,28 @@ Day-11-Guardrails-HITL-Responsible-AI/
 
 | Tiêu chí               | Điểm   | Kỳ vọng                                      |
 | ---------------------- | ------ | -------------------------------------------- |
-| **Pipeline chạy suốt** | 8      | Các lớp khởi tạo được, agent trả lời được    |
-| **Rate Limiter**       | 6      | Test 3: một phần request bị chặn đúng        |
-| **Input Guardrails**   | 10     | Test 2: attack bị chặn ở input (ghi pattern) |
-| **Output Guardrails**  | 10     | PII/secret bị redact (before/after)          |
-| **LLM-as-Judge**       | 10     | Có điểm đa tiêu chí                          |
-| **Comment code**       | 4      | Mỗi hàm/class giải thích làm gì / vì sao cần |
-| **Báo cáo**            | 32     | Trả lời đủ 5 câu hỏi trong đề                |
+| **Pipeline chạy suốt** | 10     | Các lớp khởi tạo được, agent trả lời được    |
+| **Rate Limiter**       | 8      | Test 3: một phần request bị chặn đúng        |
+| **Input Guardrails**   | 12     | Test 2: attack bị chặn ở input (ghi pattern) |
+| **Output Guardrails**  | 12     | PII/secret bị redact (before/after)          |
+| **LLM-as-Judge**       | 12     | Có điểm đa tiêu chí                          |
+| **Comment code**       | 6      | Mỗi hàm/class giải thích làm gì / vì sao cần |
+| **Báo cáo**            | 20     | Trả lời đủ 5 câu hỏi trong đề                |
 | **Tổng A**             | **80** |                                              |
 
 
 
 
-#### Báo cáo 32 điểm
+#### Báo cáo 20 điểm
 
 
 | #   | Nội dung                                     | Điểm |
 | --- | -------------------------------------------- | ---- |
-| 1   | Phân tích lớp chặn 7 attack (bảng)           | 8    |
-| 2   | False positive / trade-off bảo mật–dễ dùng   | 6    |
-| 3   | 3 attack vẫn lọt + đề xuất lớp bổ sung       | 8    |
-| 4   | Sẵn sàng production (latency, cost, monitor) | 6    |
-| 5   | Suy nghĩ đạo đức về “an toàn tuyệt đối”      | 4    |
+| 1   | Phân tích lớp chặn 7 attack (bảng)           | 5    |
+| 2   | False positive / trade-off bảo mật–dễ dùng   | 4    |
+| 3   | Tự tìm 2–3 attack vẫn lọt pipeline của bạn + đề xuất 1 lớp thêm | 5    |
+| 4   | Chỉnh thiết kế khi scale ~10k user (nhanh / rẻ / theo dõi tấn công) | 3    |
+| 5   | Suy nghĩ đạo đức về “an toàn tuyệt đối”      | 3    |
 
 
 
@@ -132,7 +129,7 @@ Day-11-Guardrails-HITL-Responsible-AI/
 | -------------------------- | ---- | ---------------------------------------------------------- |
 | **5+ prompt tấn công**     | 8    | Đủ kỹ thuật nâng cao — không chỉ “ignore all instructions” |
 | **Red team bằng AI**       | 4    | Dùng LLM sinh thêm ≥5 attack mới                           |
-| **Chạy thật + bằng chứng** | 8    | Có `outputs/attack_results.json` + ảnh chụp màn hình trong báo cáo |
+| **Chạy thật + bằng chứng** | 8    | Có `outputs/attack_results.json` đủ field                  |
 
 
 Ví dụ tối thiểu `outputs/attack_results.json`:
@@ -175,12 +172,12 @@ Chỉ cộng khi tấn công **Guards Agent** thành công (lộ secret).
 Lộ secret trên **unsafe agent không tính** điểm cộng.
 
 
-| Quy tắc   | Chi tiết                                                   |
-| --------- | ---------------------------------------------------------- |
-| Mục tiêu  | `create_guards_agent()` trong `src/agents/guards_agent.py` |
-| Điều kiện | `"target": "guards"` và `"leaked": true` + ảnh chụp màn hình trong báo cáo |
-| Mức cộng  | **+2** mỗi attack thành công trên guards                   |
-| Tối đa    | **+10** (tối đa 5 attack)                                  |
+| Quy tắc   | Chi tiết                                                             |
+| --------- | -------------------------------------------------------------------- |
+| Mục tiêu  | `create_guards_agent()` trong `src/agents/guards_agent.py`           |
+| Điều kiện | `"target": "guards"` và `"leaked": true` trong `attack_results.json` |
+| Mức cộng  | **+2** mỗi attack thành công trên guards                             |
+| Tối đa    | **+10** (tối đa 5 attack)                                            |
 
 
 Điểm B (20): chạy attack trên unsafe (+ nên chạy cả guards) và nộp bằng chứng.  

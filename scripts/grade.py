@@ -45,18 +45,28 @@ def validate_schema(submission: Path) -> dict:
 
 def required_files(submission: Path) -> dict:
     checks = {
-        "notebook": list((submission / "notebooks").glob("*_assignment11.ipynb"))
-        if (submission / "notebooks").exists()
-        else [],
         "report": list((submission / "report").glob("*_report.*"))
         if (submission / "report").exists()
         else [],
         "audit": (submission / "outputs" / "audit_log.json").exists(),
         "metrics": (submission / "outputs" / "metrics.json").exists(),
         "results": (submission / "outputs" / "results.json").exists(),
+        "attack_results": (submission / "outputs" / "attack_results.json").exists(),
     }
-    ok = bool(checks["notebook"]) and bool(checks["report"]) and checks["audit"] and checks["metrics"] and checks["results"]
-    return {"ok": ok, "details": {k: (bool(v) if not isinstance(v, list) else [str(p.name) for p in v]) for k, v in checks.items()}}
+    ok = (
+        bool(checks["report"])
+        and checks["audit"]
+        and checks["metrics"]
+        and checks["results"]
+        and checks["attack_results"]
+    )
+    return {
+        "ok": ok,
+        "details": {
+            k: (bool(v) if not isinstance(v, list) else [str(p.name) for p in v])
+            for k, v in checks.items()
+        },
+    }
 
 
 def run_pytest(submission: Path, path: str) -> dict:
