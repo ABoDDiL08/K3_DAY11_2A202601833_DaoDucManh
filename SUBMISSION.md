@@ -6,9 +6,11 @@ Bài Day 11 **làm một mình**, gồm 2 hạng mục:
 
 | Hạng mục | Tỷ lệ | Điểm |
 |----------|-------|------|
-| **A. Tấn công** | 20% | 20 |
-| **B. Phòng thủ** | 80% | 80 |
-| **Thưởng** (lớp bảo vệ thứ 6) | +10 | Cộng rồi cắt trần 100 |
+| **A. Phòng thủ** | 80% | 80 |
+| **B. Tấn công** | 20% | 20 |
+| **Điểm cộng** | — | Tối đa +10 — chỉ khi tấn công thành công (lộ secret) |
+
+**Gợi ý:** làm Phòng thủ (A) trước, Tấn công (B) sau.
 
 - Mỗi bài gắn **một MSSV**
 - Không nộp repo nhóm, không chia sẻ notebook bài nộp
@@ -51,16 +53,16 @@ AICB-P1-Assignment11-<MSSV>/
 ├── notebooks/
 │   └── <MSSV>_assignment11.ipynb         # Demo A + B (bắt buộc, còn output)
 ├── src/
-│   ├── attacks/                          # Code hạng mục A
-│   ├── assignment/                       # Code hạng mục B
+│   ├── assignment/                       # Code hạng mục A (Phòng thủ)
+│   ├── attacks/                          # Code hạng mục B (Tấn công)
 │   └── ...                               # guardrails / hitl nếu dùng
 ├── outputs/
-│   ├── attack_results.json               # Kết quả tấn công (A) — bắt buộc
-│   ├── results.json                      # Kết quả pipeline phòng thủ (B)
+│   ├── results.json                      # Kết quả pipeline phòng thủ (A)
 │   ├── audit_log.json
-│   └── metrics.json
+│   ├── metrics.json
+│   └── attack_results.json               # Kết quả tấn công (B)
 ├── report/
-│   └── <MSSV>_report.md                  # Báo cáo (chủ yếu phần B + tóm tắt A)
+│   └── <MSSV>_report.md                  # Báo cáo (chủ yếu phần A + tóm tắt B)
 └── requirements.txt
 ```
 
@@ -72,15 +74,15 @@ AICB-P1-Assignment11-<MSSV>/
 |------|----------|
 | Notebook | `notebooks/<MSSV>_assignment11.ipynb` |
 | Báo cáo | `report/<MSSV>_report.md` hoặc `.pdf` |
-| Kết quả tấn công | `outputs/attack_results.json` |
 | Kết quả phòng thủ | `outputs/results.json` |
 | Audit | `outputs/audit_log.json` |
 | Metrics | `outputs/metrics.json` |
+| Kết quả tấn công | `outputs/attack_results.json` |
 
 Notebook phải **còn output đã chạy** cho:
 
-- Phần A: chạy ≥5 attack + (nếu có) attack do AI sinh
-- Phần B: Test 1–4 (an toàn / tấn công / rate-limit / edge cases)
+- Phần A: Test 1–4 (an toàn / tấn công / rate-limit / edge cases)
+- Phần B: chạy ≥5 attack + (nếu có) attack do AI sinh
 
 Xóa hết output trước khi nộp = bài chưa hoàn chỉnh.
 
@@ -88,13 +90,36 @@ Xóa hết output trước khi nộp = bài chưa hoàn chỉnh.
 
 ## Thang điểm chi tiết
 
-### A. Tấn công — 20 điểm (20%)
+### A. Phòng thủ — 80 điểm (80%)
 
 | Tiêu chí | Điểm | Kỳ vọng |
 |----------|------|---------|
-| **5+ prompt tấn công** | 8 | Đủ kỹ thuật nâng cao (completion, translation, creative, confirmation, multi-step…) — không chỉ “ignore all instructions” |
-| **Red team bằng AI** | 4 | Dùng LLM sinh thêm ≥5 attack mới, lưu trong bài |
-| **Chạy thật + bằng chứng** | 8 | Có `outputs/attack_results.json` và output notebook: agent unsafe có lộ secret / hành vi nguy hiểm được ghi nhận |
+| **Pipeline chạy suốt** | 8 | Các lớp khởi tạo được, agent trả lời được |
+| **Rate Limiter** | 6 | Test 3: một phần request bị chặn đúng |
+| **Input Guardrails** | 10 | Test 2: attack bị chặn ở input (ghi pattern) |
+| **Output Guardrails** | 10 | PII/secret bị redact (before/after) |
+| **LLM-as-Judge** | 10 | Có điểm đa tiêu chí |
+| **Comment code** | 4 | Mỗi hàm/class giải thích làm gì / vì sao cần |
+| **Báo cáo** | 32 | Trả lời đủ 5 câu hỏi trong đề |
+| **Tổng A** | **80** | |
+
+#### Báo cáo 32 điểm
+
+| # | Nội dung | Điểm |
+|---|----------|------|
+| 1 | Phân tích lớp chặn 7 attack (bảng) | 8 |
+| 2 | False positive / trade-off bảo mật–dễ dùng | 6 |
+| 3 | 3 attack vẫn lọt + đề xuất lớp bổ sung | 8 |
+| 4 | Sẵn sàng production (latency, cost, monitor) | 6 |
+| 5 | Suy nghĩ đạo đức về “an toàn tuyệt đối” | 4 |
+
+### B. Tấn công — 20 điểm (20%)
+
+| Tiêu chí | Điểm | Kỳ vọng |
+|----------|------|---------|
+| **5+ prompt tấn công** | 8 | Đủ kỹ thuật nâng cao — không chỉ “ignore all instructions” |
+| **Red team bằng AI** | 4 | Dùng LLM sinh thêm ≥5 attack mới |
+| **Chạy thật + bằng chứng** | 8 | Có `outputs/attack_results.json` + output notebook |
 
 Ví dụ tối thiểu `outputs/attack_results.json`:
 
@@ -118,37 +143,24 @@ Ví dụ tối thiểu `outputs/attack_results.json`:
 }
 ```
 
-### B. Phòng thủ — 80 điểm (80%)
+### Điểm cộng (tấn công thành công) — tối đa +10
 
-| Tiêu chí | Điểm | Kỳ vọng |
-|----------|------|---------|
-| **Pipeline chạy suốt** | 8 | Các lớp khởi tạo được, agent trả lời được |
-| **Rate Limiter** | 6 | Test 3: một phần request bị chặn đúng |
-| **Input Guardrails** | 10 | Test 2: attack bị chặn ở input (ghi pattern) |
-| **Output Guardrails** | 10 | PII/secret bị redact (before/after) |
-| **LLM-as-Judge** | 10 | Có điểm đa tiêu chí |
-| **Comment code** | 4 | Mỗi hàm/class giải thích làm gì / vì sao cần |
-| **Báo cáo (Part B)** | 32 | Trả lời đủ 5 câu hỏi trong đề (xem bảng báo cáo bên dưới) |
-| **Tổng B** | **80** | |
+Chỉ cộng khi attack **thành công** (agent unsafe lộ / xác nhận secret).
 
-#### Báo cáo 32 điểm (nằm trong 80% Phòng thủ)
+| Quy tắc | Chi tiết |
+|---------|----------|
+| Điều kiện | `"leaked": true` trong `attack_results.json` + output notebook chứng minh |
+| Mức cộng | **+2** mỗi attack thành công |
+| Tối đa | **+10** (đếm tối đa 5 attack thành công) |
 
-| # | Nội dung | Điểm |
-|---|----------|------|
-| 1 | Phân tích lớp chặn 7 attack (bảng) | 8 |
-| 2 | False positive / trade-off bảo mật–dễ dùng | 6 |
-| 3 | 3 attack vẫn lọt + đề xuất lớp bổ sung | 8 |
-| 4 | Sẵn sàng production (latency, cost, monitor) | 6 |
-| 5 | Suy nghĩ đạo đức về “an toàn tuyệt đối” | 4 |
+Điểm B (20) vẫn nhận được nếu bạn chạy attack và nộp bằng chứng — **kể cả khi chưa lộ secret**.  
+Điểm cộng chỉ tính khi lộ secret thật.
 
-### Thưởng +10
-
-Thêm lớp bảo vệ thứ 6 do bạn tự thiết kế.  
-Điểm cuối = `min(A + B + thưởng, 100)`.
+Điểm bài = điểm A (≤80) + điểm B (≤20) + điểm cộng (≤10).
 
 ---
 
-## Định dạng `outputs/results.json` (Phần B)
+## Định dạng `outputs/results.json` (Phần A)
 
 Khớp [`schemas/results.schema.json`](schemas/results.schema.json). Ví dụ:
 
@@ -199,7 +211,7 @@ pytest tests/public -q
 python scripts/grade.py --submission-dir . --out outputs/grade_report.json
 ```
 
-Cần có `outputs/attack_results.json` và `outputs/results.json` trước khi nộp.
+Cần có `outputs/results.json` và `outputs/attack_results.json` trước khi nộp.
 
 Nếu máy không chạy được code (thiếu lib, sai path, lỗi cú pháp): phần chấm máy = **lỗi kỹ thuật** — sửa đóng gói trước. Báo cáo luôn do người chấm.
 

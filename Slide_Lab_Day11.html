@@ -201,7 +201,7 @@
         </div>
         <div style="grid-column:span 2;background:#1f3d2f;color:#f4f1e9;border-radius:1.8vmin;padding:1.8vmin 1.4vmin;text-align:center;display:flex;flex-direction:column;justify-content:center;">
           <div style="font-size:1.8vmin;font-weight:800;letter-spacing:.16em;color:#a7c4b2;">TỔNG</div>
-          <div style="font-size:2.6vmin;font-weight:900;margin-top:.4vmin;">150' · Tấn công 20% + Phòng thủ 80%</div>
+          <div style="font-size:2.6vmin;font-weight:900;margin-top:.4vmin;">150' · Phòng thủ 80% + Tấn công 20%</div>
         </div>
       </div>
     </div>
@@ -214,7 +214,7 @@
     <div class="head">
       <div>
         <div class="h1">CHUẨN BỊ TRƯỚC KHI BẮT ĐẦU</div>
-        <div class="sub">Google Colab <b style="color:#2e6f4f;">(khuyến nghị)</b> hoặc chạy local bằng Python</div>
+        <div class="sub">Chạy <b style="color:#2e6f4f;">local</b> hoặc Google Colab / Jupyter — chọn một</div>
       </div>
     </div>
 
@@ -430,7 +430,7 @@
           <div class="t-num">30:00</div>
           <div class="t-btns"><button class="t-start">START</button><button class="t-reset">RESET</button></div>
         </div>
-        <div class="pill" style="align-self:stretch;justify-content:center;text-align:center;">Dùng cho hạng mục <b>Phòng thủ (80%)</b> — so sánh before/after</div>
+        <div class="pill" style="align-self:stretch;justify-content:center;text-align:center;">Dùng cho hạng mục <b>A. Phòng thủ (80%)</b> — so sánh before/after</div>
       </div>
     </div>
   </section>
@@ -469,21 +469,21 @@
     <div class="head">
       <div>
         <div class="h1">CHECKLIST TRƯỚC KHI NỘP</div>
-        <div class="sub"><b>Tấn công 20%</b> + <b>Phòng thủ 80%</b> · xem SUBMISSION.md</div>
+        <div class="sub"><b>Phòng thủ 80%</b> trước · <b>Tấn công 20%</b> sau · xem SUBMISSION.md</div>
       </div>
     </div>
     <div style="flex:1;min-height:0;display:flex;gap:2.4vmin;margin-top:2.4vmin;">
-      <div style="flex:1;background:#fff;border:.4vmin solid #e5b691;border-radius:2.4vmin;padding:2.6vmin;">
-        <h4 style="margin:0 0 1.6vmin;font-size:2.3vmin;color:#a8531f;">⚔️ A. Tấn công — 20%</h4>
-        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>≥5 prompt tấn công nâng cao</span></div>
-        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>AI red team ≥5 attack mới</span></div>
-        <div class="li" style="font-size:2.1vmin;"><span class="dot">☐</span><span><code>outputs/attack_results.json</code> + output notebook</span></div>
-      </div>
       <div style="flex:1.2;background:#fff;border:.4vmin solid #cfe0d5;border-radius:2.4vmin;padding:2.6vmin;">
-        <h4 style="margin:0 0 1.6vmin;font-size:2.3vmin;color:#2e6f4f;">🛡️ B. Phòng thủ — 80%</h4>
+        <h4 style="margin:0 0 1.6vmin;font-size:2.3vmin;color:#2e6f4f;">🛡️ A. Phòng thủ — 80%</h4>
         <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>Pipeline: rate limit + input/output + judge + audit</span></div>
         <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>Test 1–4 + <code>results.json</code> / audit / metrics</span></div>
         <div class="li" style="font-size:2.1vmin;"><span class="dot">☐</span><span>Báo cáo 1–2 trang (5 câu hỏi)</span></div>
+      </div>
+      <div style="flex:1;background:#fff;border:.4vmin solid #e5b691;border-radius:2.4vmin;padding:2.6vmin;">
+        <h4 style="margin:0 0 1.6vmin;font-size:2.3vmin;color:#a8531f;">⚔️ B. Tấn công — 20%</h4>
+        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>≥5 prompt tấn công nâng cao</span></div>
+        <div class="li" style="font-size:2.1vmin;margin-bottom:1.2vmin;"><span class="dot">☐</span><span>AI red team ≥5 attack mới</span></div>
+        <div class="li" style="font-size:2.1vmin;"><span class="dot">☐</span><span><code>outputs/attack_results.json</code> + output notebook</span></div>
       </div>
       <div style="flex:.9;background:#1f3d2f;color:#f4f1e9;border-radius:2.4vmin;padding:2.6vmin;">
         <div style="font-size:1.9vmin;letter-spacing:.28em;text-transform:uppercase;color:#a7c4b2;font-weight:700;margin-bottom:1.4vmin;">Nộp bài</div>
@@ -492,26 +492,27 @@
         <div style="font-size:1.9vmin;color:#8ee0a6;font-weight:800;margin-top:1.4vmin;">Hạn: Thứ sáu 7/8, 23:59 ICT</div>
       </div>
     </div>
-    <div class="pill" style="margin-top:2.4vmin;">📩 Điểm cuối = min(A + B + thưởng, 100)</div>
+    <div class="pill" style="margin-top:2.4vmin;">📩 Điểm cộng (+2/attack, tối đa +10) chỉ khi tấn công thành công — lộ secret</div>
   </section>
 
   <!-- 13 — BONUS ARENA -->
   <section class="slide light">
     <div class="head">
-      <span class="badge grey">BONUS</span>
-      <span class="h1">ATTACK-DEFENSE ARENA</span>
+      <span class="badge grey">NHẮC LẠI</span>
+      <span class="h1">THỨ TỰ LÀM BÀI</span>
     </div>
     <div class="body">
       <div class="main">
         <div style="font-size:2.8vmin;font-weight:700;color:#2e6f4f;">Không còn mini-game Arena riêng</div>
-        <div class="li"><span class="dot">•</span><span><b>Tấn công (20%)</b> = Part 1 / <code>src/attacks/</code></span></div>
-        <div class="li"><span class="dot">•</span><span><b>Phòng thủ (80%)</b> = pipeline nhiều lớp</span></div>
-        <div class="pill">📩 Nộp theo SUBMISSION.md — cả A và B</div>
+        <div class="li"><span class="dot">•</span><span><b>A. Phòng thủ (80%)</b> — <code>src/assignment/</code> — làm trước</span></div>
+        <div class="li"><span class="dot">•</span><span><b>B. Tấn công (20%)</b> — <code>python main.py --part 1</code> — làm sau</span></div>
+        <div class="li"><span class="dot">•</span><span><b>Điểm cộng</b> (+2/attack, tối đa +10) chỉ khi lộ secret</span></div>
+        <div class="pill">📩 Nộp theo SUBMISSION.md</div>
       </div>
       <div class="side">
         <div class="card">
           <h4>Ưu tiên trên lớp</h4>
-          <p>Làm xong hạng mục Tấn công trước, rồi chuyển sang xây pipeline Phòng thủ.</p>
+          <p>Làm hạng mục Phòng thủ trước (nhiều điểm hơn), rồi mới làm Tấn công.</p>
         </div>
       </div>
     </div>

@@ -120,12 +120,12 @@ def main():
             "report_gap_analysis",
             "report_production_readiness",
             "report_ethics",
-            "bonus_sixth_layer",
+            "attack_success_bonus",
         ],
         "notes": (
             "Checks packaging + schema + public tests. "
-            "Attack 20% / Defense 80%. Reports human-reviewed. "
-            "Final = min(A+B+bonus, 100)."
+            "Defense 80% / Attack 20%. "
+            "Bonus +2 per successful leak (max +10). Reports human-reviewed."
         ),
     }
 

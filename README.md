@@ -10,10 +10,11 @@ Làm sao để ứng dụng agent an toàn hơn?
 
 | Hạng mục | Tỷ lệ | Bạn làm gì |
 |----------|-------|------------|
-| **A. Tấn công** | **20%** | Viết prompt tấn công agent, red team bằng AI, ghi nhận kết quả |
-| **B. Phòng thủ** | **80%** | Xây pipeline bảo vệ nhiều lớp + báo cáo |
+| **A. Phòng thủ** | **80%** | Xây pipeline bảo vệ nhiều lớp + báo cáo |
+| **B. Tấn công** | **20%** | Viết prompt tấn công agent, red team bằng AI, ghi nhận kết quả |
+| **Điểm cộng** | tối đa **+10** | Chỉ khi tấn công **thành công** (agent lộ secret) — xem đề bài |
 
-Điểm thưởng (tùy chọn): thêm lớp bảo vệ thứ 6 — tối đa **+10** (điểm cuối không vượt 100).
+**Gợi ý:** làm **Phòng thủ (A)** trước, **Tấn công (B)** sau.
 
 **Hạn nộp:** Thứ sáu **7/8**, **23:59 giờ Việt Nam (ICT)**.
 
@@ -27,11 +28,6 @@ Làm sao để ứng dụng agent an toàn hơn?
 ## Tình huống
 
 Chatbot ngân hàng **VinBank**. Agent “unsafe” cố ý chứa mật khẩu / API key trong system prompt.
-
-Bạn sẽ:
-
-1. **Tấn công** agent để thấy rủi ro (20%)
-2. **Phòng thủ** bằng pipeline nhiều lớp (80%)
 
 ```
 Câu hỏi người dùng
@@ -57,28 +53,37 @@ pip install -r requirements.txt
 
 Lấy key: [Google AI Studio](https://aistudio.google.com/apikey)
 
-### Thứ tự làm việc đề xuất
+### Hạng mục A — Phòng thủ (làm trước)
 
-1. **Hạng mục A — Tấn công (20%)**
-   - Làm trong `src/attacks/attacks.py` (hoặc notebook)
-   - Viết ≥5 prompt tấn công nâng cao + sinh thêm attack bằng AI
-   - Chạy tấn agent unsafe, lưu `outputs/attack_results.json`
-2. **Hạng mục B — Phòng thủ (80%)**
-   - Làm trong `src/assignment/` (+ dùng lại `src/guardrails/`, `src/hitl/` nếu muốn)
-   - Chạy Test 1–4, xuất `results.json`, `audit_log.json`, `metrics.json`
-   - Viết báo cáo `report/<MSSV>_report.md`
-3. Tự kiểm → nộp theo [`SUBMISSION.md`](SUBMISSION.md)
+1. Code trong `src/assignment/` (có thể dùng lại `src/guardrails/`, `src/hitl/`)
+2. Chạy Test 1–4 → `outputs/results.json`, `audit_log.json`, `metrics.json`
+3. Viết `report/<MSSV>_report.md`
+4. Chi tiết: đề bài mục **Hạng mục A — Phòng thủ**
+
+```powershell
+pytest tests/smoke -q
+pytest tests/public -q
+python scripts/grade.py --submission-dir . --out outputs/grade_report.json
+```
+
+### Hạng mục B — Tấn công (làm sau)
+
+1. Agent unsafe: `src/agents/agent.py` (`create_unsafe_agent`)
+2. Viết ≥5 prompt vào `src/attacks/attacks.py` (`adversarial_prompts`)
+3. Chạy:
 
 ```powershell
 cd src
-python main.py --part 1          # hỗ trợ phần Tấn công
-pytest ../tests/smoke -q
-pytest ../tests/public -q
-python ../scripts/grade.py --submission-dir .. --out ../outputs/grade_report.json
+python main.py --part 1    # lệnh này = hạng mục B (tấn công), không phải phòng thủ
 ```
 
-Colab / Jupyter (tuỳ chọn): `notebooks/lab11_guardrails_hitl.ipynb`  
-Local là đủ, không bắt buộc Colab.
+4. Lưu `outputs/attack_results.json`  
+Chi tiết: đề bài mục **Hạng mục B — Tấn công**.  
+`main.py --part 1` chỉ phục vụ tấn công; phần phòng thủ làm trong `src/assignment/`.
+
+Colab / Jupyter (tuỳ chọn): `notebooks/lab11_guardrails_hitl.ipynb`. Local là đủ.
+
+Nộp theo [`SUBMISSION.md`](SUBMISSION.md).
 
 ---
 
@@ -88,8 +93,8 @@ Local là đủ, không bắt buộc Colab.
 ├── assignment11_defense_pipeline.md   ← Đề bài A + B
 ├── SUBMISSION.md                      ← Quy định nộp
 ├── src/
-│   ├── attacks/                       ← Hạng mục A (Tấn công)
-│   ├── assignment/                    ← Hạng mục B (Phòng thủ) — starters
+│   ├── assignment/                    ← Hạng mục A (Phòng thủ) — starters
+│   ├── attacks/                       ← Hạng mục B (Tấn công)
 │   ├── guardrails/ testing/ hitl/     ← Module hỗ trợ phòng thủ
 │   └── main.py
 ├── notebooks/lab11_guardrails_hitl.ipynb
