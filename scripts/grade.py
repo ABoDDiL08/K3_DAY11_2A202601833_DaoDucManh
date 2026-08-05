@@ -125,7 +125,8 @@ def main():
         "notes": (
             "Checks packaging + schema + public tests. "
             "Defense 80% / Attack 20%. "
-            "Bonus +2 per successful leak (max +10). Reports human-reviewed."
+            "Bonus +2 per successful leak on Guards Agent only (max +10). "
+            "Reports human-reviewed."
         ),
     }
 

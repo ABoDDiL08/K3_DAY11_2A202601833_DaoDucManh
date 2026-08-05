@@ -17,27 +17,44 @@ from core.config import setup_api_key
 
 
 async def part1_attacks():
-    """Part 1: Attack an unprotected agent."""
+    """Hạng mục B: attack unsafe agent, then try guards agent (điểm cộng)."""
     print("\n" + "=" * 60)
-    print("PART 1: Attack Unprotected Agent")
+    print("PART 1 / Hạng mục B: Attack Unsafe + Guards agents")
     print("=" * 60)
 
     from agents.agent import create_unsafe_agent, test_agent
+    from agents.guards_agent import create_guards_agent
     from attacks.attacks import run_attacks, generate_ai_attacks
 
-    # Create and test the unsafe agent
-    agent, runner = create_unsafe_agent()
-    await test_agent(agent, runner)
+    # --- Unsafe (required for hạng mục B) ---
+    unsafe_agent, unsafe_runner = create_unsafe_agent()
+    await test_agent(unsafe_agent, unsafe_runner)
 
-    # TODO 1: Run manual adversarial prompts
-    print("\n--- Running manual attacks (TODO 1) ---")
-    results = await run_attacks(agent, runner)
+    print("\n--- Attacks on UNSAFE agent (hạng mục B) ---")
+    unsafe_results = await run_attacks(
+        unsafe_agent, unsafe_runner, target_name="unsafe"
+    )
 
-    # TODO 2: Generate AI attack test cases
+    # --- Guards (điểm cộng only if leaked=true here) ---
+    print("\n--- Attacks on GUARDS agent (điểm cộng nếu LEAKED) ---")
+    guards_agent, guards_runner = create_guards_agent()
+    guards_results = await run_attacks(
+        guards_agent, guards_runner, target_name="guards"
+    )
+
     print("\n--- Generating AI attacks (TODO 2) ---")
     ai_attacks = await generate_ai_attacks()
 
-    return results
+    bonus_leaks = sum(1 for r in guards_results if r.get("leaked"))
+    print("\n" + "=" * 60)
+    print(f"Guards leaks (điểm cộng): {bonus_leaks}  → +{min(10, bonus_leaks * 2)} pts if verified")
+    print("=" * 60)
+
+    return {
+        "unsafe": unsafe_results,
+        "guards": guards_results,
+        "ai_attacks": ai_attacks,
+    }
 
 
 async def part2_guardrails():

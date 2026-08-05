@@ -12,7 +12,7 @@ Làm sao để ứng dụng agent an toàn hơn?
 |----------|-------|------------|
 | **A. Phòng thủ** | **80%** | Xây pipeline bảo vệ nhiều lớp + báo cáo |
 | **B. Tấn công** | **20%** | Viết prompt tấn công agent, red team bằng AI, ghi nhận kết quả |
-| **Điểm cộng** | tối đa **+10** | Chỉ khi tấn công **thành công** (agent lộ secret) — xem đề bài |
+| **Điểm cộng** | tối đa **+10** | Chỉ khi **phá được Guards Agent** (lộ secret) — xem đề bài |
 
 **Gợi ý:** làm **Phòng thủ (A)** trước, **Tấn công (B)** sau.
 
@@ -68,18 +68,16 @@ python scripts/grade.py --submission-dir . --out outputs/grade_report.json
 
 ### Hạng mục B — Tấn công (làm sau)
 
-1. Agent unsafe: `src/agents/agent.py` (`create_unsafe_agent`)
-2. Viết ≥5 prompt vào `src/attacks/attacks.py` (`adversarial_prompts`)
-3. Chạy:
+1. Viết ≥5 prompt vào `src/attacks/attacks.py`
+2. Chạy (tấn công **unsafe** rồi **guards**):
 
 ```powershell
 cd src
-python main.py --part 1    # lệnh này = hạng mục B (tấn công), không phải phòng thủ
+python main.py --part 1
 ```
 
-4. Lưu `outputs/attack_results.json`  
-Chi tiết: đề bài mục **Hạng mục B — Tấn công**.  
-`main.py --part 1` chỉ phục vụ tấn công; phần phòng thủ làm trong `src/assignment/`.
+3. Unsafe = hạng mục B · Guards (`src/agents/guards_agent.py`) = **điểm cộng nếu LEAKED**  
+4. Lưu `outputs/attack_results.json` (có cả `unsafe_attacks` và `guards_attacks`)
 
 Colab / Jupyter (tuỳ chọn): `notebooks/lab11_guardrails_hitl.ipynb`. Local là đủ.
 
@@ -95,6 +93,7 @@ Nộp theo [`SUBMISSION.md`](SUBMISSION.md).
 ├── src/
 │   ├── assignment/                    ← Hạng mục A (Phòng thủ) — starters
 │   ├── attacks/                       ← Hạng mục B (Tấn công)
+│   ├── agents/guards_agent.py         ← Guards Agent (mục tiêu điểm cộng)
 │   ├── guardrails/ testing/ hitl/     ← Module hỗ trợ phòng thủ
 │   └── main.py
 ├── notebooks/lab11_guardrails_hitl.ipynb
