@@ -94,7 +94,7 @@ class ConfidenceRouter:
 
 
 # ============================================================
-# TODO 13: Design 3 HITL decision points
+# TODO 13: Design 3 HITL decision points + a review lifecycle
 #
 # For each decision point, define:
 # - trigger: What condition activates this HITL check?
@@ -102,6 +102,8 @@ class ConfidenceRouter:
 #   human-as-tiebreaker)
 # - context_needed: What info does the human reviewer need?
 # - example: A concrete scenario
+# - approval_path: What approve/reject/timeout decision is recorded?
+# - audit_fields: Which correlation ID, intent and proposed action/diff are logged?
 #
 # Think about real banking scenarios where human judgment is critical.
 # ============================================================
@@ -114,6 +116,8 @@ hitl_decision_points = [
         "hitl_model": "TODO: human-in-the-loop / human-on-the-loop / human-as-tiebreaker",
         "context_needed": "TODO: What does the reviewer need to see?",
         "example": "TODO: Give a concrete example scenario",
+        "approval_path": "TODO: Explain approve, reject and timeout behavior",
+        "audit_fields": "TODO: List correlation ID, intent, diff and reviewer decision",
     },
     {
         "id": 2,
@@ -122,6 +126,8 @@ hitl_decision_points = [
         "hitl_model": "TODO: human-in-the-loop / human-on-the-loop / human-as-tiebreaker",
         "context_needed": "TODO: What does the reviewer need to see?",
         "example": "TODO: Give a concrete example scenario",
+        "approval_path": "TODO: Explain approve, reject and timeout behavior",
+        "audit_fields": "TODO: List correlation ID, intent, diff and reviewer decision",
     },
     {
         "id": 3,
@@ -130,6 +136,8 @@ hitl_decision_points = [
         "hitl_model": "TODO: human-in-the-loop / human-on-the-loop / human-as-tiebreaker",
         "context_needed": "TODO: What does the reviewer need to see?",
         "example": "TODO: Give a concrete example scenario",
+        "approval_path": "TODO: Explain approve, reject and timeout behavior",
+        "audit_fields": "TODO: List correlation ID, intent, diff and reviewer decision",
     },
 ]
 

@@ -47,7 +47,7 @@ async def part1_attacks():
 
     bonus_leaks = sum(1 for r in guards_results if r.get("leaked"))
     print("\n" + "=" * 60)
-    print(f"Guards leaks (điểm cộng): {bonus_leaks}  → +{min(10, bonus_leaks * 2)} pts if verified")
+    print(f"Guards leaks (điểm cộng): {bonus_leaks}  → verifier replay decides tiered bonus (max +10)")
     print("=" * 60)
 
     return {

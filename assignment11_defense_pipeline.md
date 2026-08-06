@@ -1,5 +1,10 @@
 # Assignment 11: Phòng thủ & Tấn công Agent AI
 
+> **Superseded for the 2026 delivery.** Follow
+> [assignment11_agent_security_2026.md](assignment11_agent_security_2026.md) for
+> the current rubric and contracts. This document remains a reference for the
+> original starter walkthrough only.
+
 **Môn:** AICB-P1 — AI Agent Development  
 **Hình thức:** **Cá nhân** (không làm nhóm)  
 **Hạn nộp:** Thứ sáu ngày 7/8, 23:59 giờ Việt Nam (ICT)  
@@ -521,4 +526,3 @@ class DefensePipeline:
 - [OWASP Top 10 for LLM](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [AI Safety Fundamentals](https://aisafetyfundamentals.com/)
 - Code lab: thư mục `src/` và `notebooks/lab11_guardrails_hitl.ipynb`
-
