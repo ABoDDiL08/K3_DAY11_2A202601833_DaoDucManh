@@ -1,6 +1,6 @@
 """
 Lab 11 — Part 2A: Input Guardrails
-  TODO 3: Injection detection (regex)
+  TODO 3: Injection detection (normalization + layered signals)
   TODO 4: Topic filter
   TODO 5: Input Guardrail Plugin (ADK)
 """
@@ -16,16 +16,20 @@ from core.config import ALLOWED_TOPICS, BLOCKED_TOPICS
 # ============================================================
 # TODO 3: Implement detect_injection()
 #
-# Write regex patterns to detect prompt injection.
+# Canonicalize Unicode/invisible spacing, then detect prompt injection.
 # The function takes user_input (str) and returns True if injection is detected.
 #
-# Suggested patterns:
+# Required cases:
 # - "ignore (all )?(previous|above) instructions"
 # - "you are now"
 # - "system prompt"
 # - "reveal your (instructions|prompt)"
 # - "pretend you are"
 # - "act as (a |an )?unrestricted"
+# Also handle an instruction embedded in an untrusted email/RAG document, e.g.
+# ``Ignore\u200b all previous instructions``. Do not block a benign request to
+# summarize an external bank-transfer email just because it is external data.
+# Regex is one signal, not the whole security boundary.
 # ============================================================
 
 def detect_injection(user_input: str) -> bool:

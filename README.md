@@ -1,18 +1,24 @@
-# Day 11 — Guardrails, HITL & Responsible AI
+# Day 11 — Controlled Agent Security (2026)
 
 Làm sao để ứng dụng agent an toàn hơn?
+
+> **Dùng assignment mới:** đọc [assignment11_agent_security_2026.md](assignment11_agent_security_2026.md).
+> Tài liệu pipeline cũ được giữ làm tham khảo API/starter, nhưng rubric 2026 chấm
+> theo untrusted content, quyền action, HITL, egress và incident response.
 
 **Hình thức:** bài tập **cá nhân** (1 người / 1 MSSV).
 
 ---
 
-## Hai hạng mục cần làm
+## Rubric 2026
 
-| Hạng mục | Tỷ lệ | Bạn làm gì |
-|----------|-------|------------|
-| **A. Phòng thủ** | **80%** | Xây pipeline bảo vệ nhiều lớp + báo cáo |
-| **B. Tấn công** | **20%** | Viết prompt tấn công agent, red team bằng AI, ghi nhận kết quả |
-| **Điểm cộng** | tối đa **+10** | Chỉ khi **phá được Guards Agent** (lộ secret) — xem đề bài |
+| Năng lực | Điểm | Bạn làm gì |
+|---|---:|---|
+| Direct + indirect guardrails | 35 | Xử lý jailbreak, email/RAG untrusted, Unicode và false positive |
+| Permission + HITL | 35 | Egress allowlist, high-risk action, approval/reject/timeout/audit |
+| Output + incident response | 20 | Redact PII/secret, monitoring, correlation trace |
+| Red team | 10 | Attack taxonomy và report source-to-sink |
+| Bonus | +10 | Verifier replay xác nhận Guards leak; không tin transcript tự khai |
 
 **Gợi ý:** làm **Phòng thủ (A)** trước, **Tấn công (B)** sau.
 
@@ -20,7 +26,8 @@ Làm sao để ứng dụng agent an toàn hơn?
 
 | Tài liệu | Dùng để |
 |----------|---------|
-| [`assignment11_defense_pipeline.md`](assignment11_defense_pipeline.md) | Đề bài chi tiết (A + B) |
+| [`assignment11_agent_security_2026.md`](assignment11_agent_security_2026.md) | Đề bài và rubric hiện hành |
+| [`assignment11_defense_pipeline.md`](assignment11_defense_pipeline.md) | Walkthrough starter cũ (tham khảo) |
 | [`SUBMISSION.md`](SUBMISSION.md) | Cách nộp, tên file, cấu trúc thư mục |
 
 ---
@@ -53,12 +60,12 @@ pip install -r requirements.txt
 
 Lấy key: [Google AI Studio](https://aistudio.google.com/apikey)
 
-### Hạng mục A — Phòng thủ (làm trước)
+### Phần bắt buộc — Controlled Agent Security
 
 1. Code trong `src/assignment/` (có thể dùng lại `src/guardrails/`, `src/hitl/`)
-2. Chạy Test 1–4 → `outputs/results.json`, `audit_log.json`, `metrics.json`
+2. Implement `is_egress_allowed`, indirect-content guard, HITL lifecycle, audit và monitoring
 3. Viết `report/<MSSV>_report.md`
-4. Chi tiết: đề bài mục **Hạng mục A — Phòng thủ**
+4. Chi tiết: [`assignment11_agent_security_2026.md`](assignment11_agent_security_2026.md)
 
 ```powershell
 pytest tests/smoke -q
@@ -66,7 +73,7 @@ pytest tests/public -q
 python scripts/grade.py --submission-dir . --out outputs/grade_report.json
 ```
 
-### Hạng mục B — Tấn công (làm sau)
+### Red team và bonus
 
 1. Viết ≥5 prompt vào `src/attacks/attacks.py`
 2. Chạy (tấn công **unsafe** rồi **guards**):
@@ -76,8 +83,8 @@ cd src
 python main.py --part 1
 ```
 
-3. Unsafe = hạng mục B · Guards (`src/agents/guards_agent.py`) = **điểm cộng nếu LEAKED**  
-4. Lưu `outputs/attack_results.json` (có cả `unsafe_attacks` và `guards_attacks`)
+3. Unsafe = attack target để phân tích. Guards (`src/agents/guards_agent.py`) = **bonus chỉ khi verifier replay xác nhận leak**.
+4. Lưu `outputs/attack_results.json` làm evidence; không tự cấp runtime score hoặc bonus.
 
 Colab / Jupyter (tuỳ chọn): `notebooks/lab11_guardrails_hitl.ipynb`. Local là đủ.
 
@@ -88,13 +95,15 @@ Nộp theo [`SUBMISSION.md`](SUBMISSION.md).
 ## Cấu trúc repo
 
 ```
-├── assignment11_defense_pipeline.md   ← Đề bài A + B
+├── assignment11_agent_security_2026.md ← Đề bài 2026
+├── assignment11_defense_pipeline.md   ← Walkthrough cũ (tham khảo)
 ├── SUBMISSION.md                      ← Quy định nộp
 ├── data/pii_hallucination_samples.json ← PII + ground_truth đối chiếu hallucination
 ├── src/
 │   ├── assignment/                    ← Hạng mục A (Phòng thủ) — starters
 │   ├── attacks/                       ← Hạng mục B (Tấn công)
-│   ├── agents/guards_agent.py         ← Guards Agent (mục tiêu điểm cộng)
+│   ├── agents/security_boundary.py    ← Reference provenance / action boundary
+│   ├── agents/guards_agent.py         ← Guards Agent (mục tiêu bonus)
 │   ├── guardrails/ testing/ hitl/     ← Module hỗ trợ phòng thủ
 │   └── main.py
 ├── notebooks/lab11_guardrails_hitl.ipynb

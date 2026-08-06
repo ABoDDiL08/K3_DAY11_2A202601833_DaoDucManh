@@ -11,6 +11,17 @@ from assignment.audit_log import AuditLogPlugin
 from assignment.monitoring import MonitoringAlert
 
 
+def is_egress_allowed(destination: str, payload: str) -> bool:
+    """TODO 10A: Enforce a destination allowlist before any data leaves the agent.
+
+    Return ``True`` only for an approved VinBank HTTPS endpoint and ordinary
+    banking payload. Return ``False`` for unknown domains and payloads that
+    contain a password, API key, database host, phone number or email address.
+    Do not let the LLM's prose decide this policy.
+    """
+    raise NotImplementedError("Implement is_egress_allowed")
+
+
 def build_production_plugins(
     *,
     max_requests: int = 10,
@@ -18,7 +29,7 @@ def build_production_plugins(
     use_llm_judge: bool = True,
 ) -> list:
     """
-    TODO: Return an ordered list of plugins / layers:
+    TODO 9: Return an ordered list of plugins / layers:
 
     1. RateLimitPlugin
     2. InputGuardrailPlugin  (from guardrails.input_guardrails)
@@ -26,6 +37,7 @@ def build_production_plugins(
     4. (optional) NeMo wrapper
 
     Audit/monitoring can be plugins or side observers — document your choice.
+    The action gateway calls ``is_egress_allowed`` separately before any sink.
     """
     raise NotImplementedError("Implement build_production_plugins")
 
