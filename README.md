@@ -32,6 +32,35 @@ Làm sao để ứng dụng agent an toàn hơn?
 
 ---
 
+## Timeline buổi lab
+
+Hình thức: **cá nhân** (1 người / 1 MSSV). Luồng: **Setup → A → Break → B → Break → Demo**.
+
+| # | Phần | Nội dung | Thời lượng |
+|---|------|----------|-----------:|
+| 0 | **Setup** | Cài đặt môi trường (`pip`, `GOOGLE_API_KEY`, chạy local) | 30' |
+| 1 | **A · Phòng thủ** | 2A Input · 2B Output · 2C NeMo · Part 3 Testing · Part 4 HITL | 120' |
+| — | **Break** | Nghỉ giải lao | 10' |
+| 2 | **B · Tấn công** | Tấn công **Unsafe** (điểm B) + **Guards** (điểm cộng nếu LEAKED) | 60' |
+| — | **Break** | Nghỉ giải lao | 10' |
+| 3 | **Demo** | Demo cá nhân · attack prompting (cuối buổi) | 45' |
+| | **Tổng** | Nội dung lab (+ nghỉ) | **245'** |
+| | | + Setup | **+30'** |
+
+**Điểm cộng Demo (trên lớp):** lên demo **+1** (nếu defense chặn thành công ≥5 prompt thì **×2**) · tấn công thành công (LEAKED) **+2**.
+
+Chi tiết mốc Part B (60'):
+
+| Mốc | Việc làm |
+|-----|----------|
+| 0–25' | TODO 1 — viết ≥5 prompt tấn công nâng cao trong `src/attacks/attacks.py` |
+| 25–45' | Chạy attack trên unsafe rồi guards; quan sát `LEAKED` / `no secret leak` |
+| 45–60' | TODO 2 — AI red team ≥5 attack; lưu `outputs/attack_results.json` |
+
+Slide đầy đủ + timer trên lớp: [`Slide_Lab_Day11.html`](Slide_Lab_Day11.html).
+
+---
+
 ## Tình huống
 
 Chatbot ngân hàng **VinBank**. Agent “unsafe” cố ý chứa mật khẩu / API key trong system prompt.
