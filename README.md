@@ -90,6 +90,7 @@ Nộp theo [`SUBMISSION.md`](SUBMISSION.md).
 ```
 ├── assignment11_defense_pipeline.md   ← Đề bài A + B
 ├── SUBMISSION.md                      ← Quy định nộp
+├── data/pii_hallucination_samples.json ← PII + ground_truth đối chiếu hallucination
 ├── src/
 │   ├── assignment/                    ← Hạng mục A (Phòng thủ) — starters
 │   ├── attacks/                       ← Hạng mục B (Tấn công)
