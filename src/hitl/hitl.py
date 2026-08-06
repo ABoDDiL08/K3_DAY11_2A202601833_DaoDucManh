@@ -1,13 +1,13 @@
 """
 Lab 11 — Part 4: Human-in-the-Loop Design
-  TODO 12: Confidence Router
-  TODO 13: Design 3 HITL decision points
+  TODO 11: Confidence Router
+  TODO 12: Design 3 HITL decision points
 """
 from dataclasses import dataclass
 
 
 # ============================================================
-# TODO 12: Implement ConfidenceRouter
+# TODO 11: Implement ConfidenceRouter
 #
 # Route agent responses based on confidence scores:
 #   - HIGH (>= 0.9): Auto-send to user
@@ -65,7 +65,7 @@ class ConfidenceRouter:
         Returns:
             RoutingDecision with routing action and metadata
         """
-        # TODO 12: Implement routing logic
+        # TODO 11: Implement routing logic
         #
         # 1. Check if action_type is in HIGH_RISK_ACTIONS
         #    -> If yes: always escalate (action="escalate", priority="high",
@@ -94,7 +94,7 @@ class ConfidenceRouter:
 
 
 # ============================================================
-# TODO 13: Design 3 HITL decision points + a review lifecycle
+# TODO 12: Design 3 HITL decision points + a review lifecycle
 #
 # For each decision point, define:
 # - trigger: What condition activates this HITL check?

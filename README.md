@@ -2,15 +2,44 @@
 
 Làm sao để ứng dụng agent an toàn hơn?
 
-> **Dùng assignment mới:** đọc [assignment11_agent_security_2026.md](assignment11_agent_security_2026.md).
-> Tài liệu pipeline cũ được giữ làm tham khảo API/starter, nhưng rubric 2026 chấm
-> theo untrusted content, quyền action, HITL, egress và incident response.
-
 **Hình thức:** bài tập **cá nhân** (1 người / 1 MSSV).
+
+**Đề bài duy nhất:** [`assignment11.md`](assignment11.md) · Cách nộp: [`SUBMISSION.md`](SUBMISSION.md)
 
 ---
 
-## Rubric 2026
+## Cài đặt môi trường (làm trước)
+
+```powershell
+# 1) Tạo + kích hoạt virtualenv (khuyến nghị)
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# 2) API key
+Copy-Item .env.example .env
+# Mở .env, dán GOOGLE_API_KEY — lấy tại https://aistudio.google.com/apikey
+
+# 3) Cài dependency trong venv
+python -m pip install -U pip
+pip install -r requirements.txt
+```
+
+Mỗi lần mở terminal mới: `.\.venv\Scripts\Activate.ps1` rồi mới chạy code.
+
+Nếu PowerShell báo không cho chạy script:  
+`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+
+PowerShell (nếu chưa load `.env`):
+
+```powershell
+$env:GOOGLE_API_KEY="dán-key-của-bạn"
+```
+
+---
+
+## Rubric (tóm tắt)
+
+Chi tiết đầy đủ trong [`assignment11.md`](assignment11.md).
 
 | Năng lực | Điểm | Bạn làm gì |
 |---|---:|---|
@@ -26,8 +55,7 @@ Làm sao để ứng dụng agent an toàn hơn?
 
 | Tài liệu | Dùng để |
 |----------|---------|
-| [`assignment11_agent_security_2026.md`](assignment11_agent_security_2026.md) | Đề bài và rubric hiện hành |
-| [`assignment11_defense_pipeline.md`](assignment11_defense_pipeline.md) | Walkthrough starter cũ (tham khảo) |
+| [`assignment11.md`](assignment11.md) | **Đề bài duy nhất** (rubric + cách chạy A/B) |
 | [`SUBMISSION.md`](SUBMISSION.md) | Cách nộp, tên file, cấu trúc thư mục |
 
 ---
@@ -53,9 +81,9 @@ Chi tiết mốc Part B (60'):
 
 | Mốc | Việc làm |
 |-----|----------|
-| 0–25' | TODO 1 — viết ≥5 prompt tấn công nâng cao trong `src/attacks/attacks.py` |
+| 0–25' | TODO 13 — viết ≥5 prompt tấn công nâng cao trong `src/attacks/attacks.py` |
 | 25–45' | Chạy attack trên unsafe rồi guards; quan sát `LEAKED` / `no secret leak` |
-| 45–60' | TODO 2 — AI red team ≥5 attack; lưu `outputs/attack_results.json` |
+| 45–60' | TODO 14 — AI red team ≥5 attack; lưu `outputs/attack_results.json` |
 
 Slide đầy đủ + timer trên lớp: [`Slide_Lab_Day11.html`](Slide_Lab_Day11.html).
 
@@ -79,22 +107,31 @@ Câu hỏi người dùng
 
 ## Làm bài trên máy
 
-### Cài đặt
+> Đã cài môi trường ở mục **Cài đặt môi trường** phía trên chưa? Nếu chưa thì làm trước.
+
+### Phần A — Phòng thủ
+
+**Thứ tự:** sửa TODO trong file → rồi mới chạy lệnh. Chi tiết: [`assignment11.md`](assignment11.md) §5.
+
+| Làm trước | File |
+|-----------|------|
+| TODO **1–3** | `src/guardrails/input_guardrails.py` |
+| TODO **4–6** | `src/guardrails/output_guardrails.py` |
+| TODO **7** (tuỳ chọn) | `src/guardrails/nemo_guardrails.py` |
+| TODO **8** (+ egress 8A) | `src/assignment/*.py` → rồi `python main.py --part 5` |
+| TODO **9–10** | `src/testing/testing.py` |
+| TODO **11–12** | `src/hitl/hitl.py` |
+| TODO **13–14** (phần B) | `src/attacks/attacks.py` |
+
+Sau khi đã code, kiểm:
 
 ```powershell
-Copy-Item .env.example .env
-# Mở .env, dán GOOGLE_API_KEY
-pip install -r requirements.txt
+cd src
+python main.py --part 2    # sau TODO 1–6 (+7 NeMo)
+python main.py --part 3    # sau TODO 9–10
+python main.py --part 4    # sau TODO 11–12
+python main.py --part 5    # sau TODO 8 → outputs/results.json (+ audit/metrics)
 ```
-
-Lấy key: [Google AI Studio](https://aistudio.google.com/apikey)
-
-### Phần bắt buộc — Controlled Agent Security
-
-1. Code trong `src/assignment/` (có thể dùng lại `src/guardrails/`, `src/hitl/`)
-2. Implement `is_egress_allowed`, indirect-content guard, HITL lifecycle, audit và monitoring
-3. Viết `report/<MSSV>_report.md`
-4. Chi tiết: [`assignment11_agent_security_2026.md`](assignment11_agent_security_2026.md)
 
 ```powershell
 pytest tests/smoke -q
@@ -102,7 +139,9 @@ pytest tests/public -q
 python scripts/grade.py --submission-dir . --out outputs/grade_report.json
 ```
 
-### Red team và bonus
+Viết `report/<MSSV>_report.md`.
+
+### Phần B — Red team và bonus
 
 1. Viết ≥5 prompt vào `src/attacks/attacks.py`
 2. Chạy (tấn công **unsafe** rồi **guards**):
@@ -124,8 +163,7 @@ Nộp theo [`SUBMISSION.md`](SUBMISSION.md).
 ## Cấu trúc repo
 
 ```
-├── assignment11_agent_security_2026.md ← Đề bài 2026
-├── assignment11_defense_pipeline.md   ← Walkthrough cũ (tham khảo)
+├── assignment11.md                    ← Đề bài duy nhất
 ├── SUBMISSION.md                      ← Quy định nộp
 ├── data/pii_hallucination_samples.json ← PII + ground_truth đối chiếu hallucination
 ├── src/

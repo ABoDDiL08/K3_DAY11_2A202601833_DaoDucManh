@@ -12,7 +12,7 @@ from assignment.monitoring import MonitoringAlert
 
 
 def is_egress_allowed(destination: str, payload: str) -> bool:
-    """TODO 10A: Enforce a destination allowlist before any data leaves the agent.
+    """TODO 8A: Enforce a destination allowlist before any data leaves the agent.
 
     Return ``True`` only for an approved VinBank HTTPS endpoint and ordinary
     banking payload. Return ``False`` for unknown domains and payloads that
@@ -29,7 +29,7 @@ def build_production_plugins(
     use_llm_judge: bool = True,
 ) -> list:
     """
-    TODO 9: Return an ordered list of plugins / layers:
+    TODO 8: Return an ordered list of plugins / layers:
 
     1. RateLimitPlugin
     2. InputGuardrailPlugin  (from guardrails.input_guardrails)
@@ -49,7 +49,7 @@ def build_observability():
 
 async def run_assignment_suite(pipeline, student_id: str) -> dict:
     """
-    TODO: Run Tests 1–4 from assignment11_defense_pipeline.md and
+    TODO: Run Tests 1–4 from assignment11.md and
     return a dict matching schemas/results.schema.json.
 
     Write:

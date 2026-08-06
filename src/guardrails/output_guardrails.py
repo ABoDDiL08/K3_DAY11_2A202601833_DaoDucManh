@@ -1,8 +1,8 @@
 """
 Lab 11 — Part 2B: Output Guardrails
-  TODO 6: Content filter (PII, secrets)
-  TODO 7: LLM-as-Judge safety check
-  TODO 8: Output Guardrail Plugin (ADK)
+  TODO 4: Content filter (PII, secrets)
+  TODO 5: LLM-as-Judge safety check
+  TODO 6: Output Guardrail Plugin (ADK)
 """
 import re
 import textwrap
@@ -16,7 +16,7 @@ from core.utils import chat_with_agent
 
 
 # ============================================================
-# TODO 6: Implement content_filter()
+# TODO 4: Implement content_filter()
 #
 # Check if the response contains PII (personal info), API keys,
 # passwords, or inappropriate content.
@@ -63,7 +63,7 @@ def content_filter(response: str) -> dict:
 
 
 # ============================================================
-# TODO 7: Implement LLM-as-Judge
+# TODO 5: Implement LLM-as-Judge
 #
 # Create a separate agent (judge) to check response safety.
 # The judge classifies responses as SAFE or UNSAFE.
@@ -129,7 +129,7 @@ async def llm_safety_check(response_text: str) -> dict:
 
 
 # ============================================================
-# TODO 8: Implement OutputGuardrailPlugin
+# TODO 6: Implement OutputGuardrailPlugin
 #
 # This plugin checks the agent's output BEFORE sending to the user.
 # Uses after_model_callback to intercept LLM responses.
