@@ -214,33 +214,25 @@
     <div class="head">
       <div>
         <div class="h1">CHUẨN BỊ TRƯỚC KHI BẮT ĐẦU</div>
-        <div class="sub">Chạy <b style="color:#2e6f4f;">local</b> hoặc Google Colab / Jupyter — chọn một</div>
+        <div class="sub">Cài đặt môi trường (<b style="color:#2e6f4f;">30 phút</b>) · chạy <b style="color:#2e6f4f;">local</b></div>
       </div>
+      <span class="clock">30 phút</span>
     </div>
 
     <div class="body">
       <div class="main">
-        <div class="grid2">
-          <div class="card">
-            <h4>☁️ Google Colab</h4>
-            <p>1. Upload <code>notebooks/lab11_guardrails_hitl.ipynb</code><br>
-            2. Tạo API key tại Google AI Studio<br>
-            3. Lưu vào Colab Secrets với tên <b>GOOGLE_API_KEY</b><br>
-            4. Run cells theo đúng thứ tự</p>
-          </div>
-          <div class="card">
-            <h4>💻 Local (Python modules)</h4>
-            <p><code>pip install -r requirements.txt</code><br>
-            <code>export GOOGLE_API_KEY="..."</code><br>
-            <code>python main.py --part 1|2|3|4</code><br>
-            hoặc chạy từng module trong <code>src/</code></p>
-          </div>
+        <div class="card">
+          <h4>💻 Local (Python modules)</h4>
+          <p><code>pip install -r requirements.txt</code><br>
+          <code>export GOOGLE_API_KEY="..."</code><br>
+          <code>python main.py --part 1|2|3|4</code><br>
+          hoặc chạy từng module trong <code>src/</code></p>
         </div>
         <div class="li"><span class="dot">•</span><span>Bộ công cụ dùng trong bài:</span></div>
         <div class="chips">
           <span class="chip on">Google ADK</span>
           <span class="chip on">NeMo Guardrails (NVIDIA · Colang)</span>
-          <span class="chip on">Gemini 2.5 Flash / Flash Lite</span>
+          <span class="chip on">Gemini 3.1 Flash Lite</span>
         </div>
         <div class="pill">⚠️ Agent "unsafe" trong bài <b>cố tình</b> nhúng sẵn mật khẩu/API key giả trong system prompt để bạn thấy hậu quả thật — đây không phải secret thật</div>
       </div>
