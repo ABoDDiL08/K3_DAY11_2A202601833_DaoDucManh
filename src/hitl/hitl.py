@@ -3,7 +3,12 @@ Lab 11 — Part 4: Human-in-the-Loop Design
   TODO 11: Confidence Router
   TODO 12: Design 3 HITL decision points
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+import hashlib
+import json
+import math
+import uuid
 
 
 # ============================================================
@@ -65,32 +70,200 @@ class ConfidenceRouter:
         Returns:
             RoutingDecision with routing action and metadata
         """
-        # TODO 11: Implement routing logic
-        #
-        # 1. Check if action_type is in HIGH_RISK_ACTIONS
-        #    -> If yes: always escalate (action="escalate", priority="high",
-        #       requires_human=True, reason="High-risk action: {action_type}")
-        #
-        # 2. Check confidence thresholds:
-        #    - confidence >= 0.9:
-        #      action="auto_send", priority="low",
-        #      requires_human=False, reason="High confidence"
-        #
-        #    - 0.7 <= confidence < 0.9:
-        #      action="queue_review", priority="normal",
-        #      requires_human=True, reason="Medium confidence — needs review"
-        #
-        #    - confidence < 0.7:
-        #      action="escalate", priority="high",
-        #      requires_human=True, reason="Low confidence — escalating"
+        action = (action_type or "general").casefold()
+        try:
+            score = float(confidence)
+        except (TypeError, ValueError):
+            score = float("nan")
 
+        # Invalid confidence, an empty response, and a high-risk action all
+        # fail closed. Confidence is advisory; it is never permission to
+        # bypass a deterministic risk policy.
+        if action in {item.casefold() for item in HIGH_RISK_ACTIONS}:
+            return RoutingDecision(
+                action="escalate",
+                confidence=confidence,
+                reason=f"High-risk action: {action_type}",
+                priority="high",
+                requires_human=True,
+            )
+        if not math.isfinite(score) or score < 0.0 or score > 1.0:
+            return RoutingDecision(
+                action="escalate",
+                confidence=0.0 if not math.isfinite(score) else score,
+                reason="Invalid confidence — escalating for human review",
+                priority="high",
+                requires_human=True,
+            )
+        if not (response or "").strip():
+            return RoutingDecision(
+                action="escalate",
+                confidence=score,
+                reason="Empty response — escalating for human review",
+                priority="high",
+                requires_human=True,
+            )
+        if score >= self.HIGH_THRESHOLD:
+            return RoutingDecision(
+                action="auto_send",
+                confidence=score,
+                reason="High confidence",
+                priority="low",
+                requires_human=False,
+            )
+        if score >= self.MEDIUM_THRESHOLD:
+            return RoutingDecision(
+                action="queue_review",
+                confidence=score,
+                reason="Medium confidence — needs review",
+                priority="normal",
+                requires_human=True,
+            )
         return RoutingDecision(
-            action="auto_send",
-            confidence=confidence,
-            reason="TODO: implement routing logic",
-            priority="low",
-            requires_human=False,
-        )  # TODO: Replace with implementation
+            action="escalate",
+            confidence=score,
+            reason="Low confidence — escalating",
+            priority="high",
+            requires_human=True,
+        )
+
+
+@dataclass
+class HITLReview:
+    """A review record whose default outcome is not approved."""
+
+    review_id: str
+    request_id: str
+    intent: str
+    proposed_action: str
+    context: dict
+    diff: dict
+    created_at: str
+    expires_at: str
+    status: str = "pending"
+    reviewer_id: str | None = None
+    decision_reason: str | None = None
+    approval_id: str | None = None
+    integrity_hash: str | None = None
+
+
+class HITLReviewQueue:
+    """Minimal, auditable approve/reject/timeout lifecycle.
+
+    The queue is intentionally fail-closed: pending and timeout records are
+    never treated as approval, and approval requires an identified reviewer.
+    """
+
+    def __init__(self, default_timeout_seconds: int = 300):
+        if default_timeout_seconds <= 0:
+            raise ValueError("default_timeout_seconds must be positive")
+        self.default_timeout_seconds = default_timeout_seconds
+        self.reviews: dict[str, HITLReview] = {}
+
+    @staticmethod
+    def _fingerprint(review: HITLReview) -> str:
+        """Hash the exact decision material shown to the reviewer.
+
+        HITL is a security boundary only if the text approved is the text
+        executed. The hash covers nested context/diff values and is checked
+        again immediately before approval.
+        """
+        material = {
+            "request_id": review.request_id,
+            "intent": review.intent,
+            "proposed_action": review.proposed_action,
+            "context": review.context,
+            "diff": review.diff,
+        }
+        canonical = json.dumps(
+            material,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            default=str,
+        ).encode("utf-8")
+        return hashlib.sha256(canonical).hexdigest()
+
+    @staticmethod
+    def _expire_if_needed(review: HITLReview) -> bool:
+        """Mark a pending review expired; malformed timestamps fail closed."""
+        if review.status != "pending":
+            return review.status == "timeout"
+        try:
+            expires_at = datetime.fromisoformat(review.expires_at)
+        except (TypeError, ValueError):
+            review.status = "timeout"
+            review.decision_reason = "invalid expiry timestamp"
+            return True
+        if datetime.now(timezone.utc) >= expires_at:
+            review.status = "timeout"
+            review.decision_reason = "review timeout"
+            return True
+        return False
+
+    def submit(
+        self,
+        *,
+        request_id: str,
+        intent: str,
+        proposed_action: str,
+        context: dict | None = None,
+        diff: dict | None = None,
+        timeout_seconds: int | None = None,
+    ) -> HITLReview:
+        now = datetime.now(timezone.utc)
+        expires = now + timedelta(seconds=timeout_seconds or self.default_timeout_seconds)
+        review = HITLReview(
+            review_id=f"review-{uuid.uuid4().hex}",
+            request_id=request_id,
+            intent=intent,
+            proposed_action=proposed_action,
+            context=dict(context or {}),
+            diff=dict(diff or {}),
+            created_at=now.isoformat(),
+            expires_at=expires.isoformat(),
+        )
+        review.integrity_hash = self._fingerprint(review)
+        self.reviews[review.review_id] = review
+        return review
+
+    def decide(
+        self,
+        review_id: str,
+        decision: str,
+        *,
+        reviewer_id: str | None,
+        reason: str = "",
+    ) -> HITLReview:
+        review = self.reviews[review_id]
+        if review.status != "pending":
+            raise ValueError(f"review is already {review.status}")
+        if self._expire_if_needed(review):
+            raise ValueError("review has expired; approval denied")
+        if not review.integrity_hash or review.integrity_hash != self._fingerprint(review):
+            review.status = "tampered"
+            review.decision_reason = "review material changed after submission"
+            raise ValueError("review material was tampered with; approval denied")
+        normalized = decision.casefold().strip()
+        if normalized not in {"approve", "reject"}:
+            raise ValueError("decision must be approve or reject")
+        if not isinstance(reviewer_id, str) or not reviewer_id.strip():
+            raise ValueError("reviewer_id is required")
+        review.reviewer_id = reviewer_id.strip()
+        review.decision_reason = reason
+        if normalized == "approve":
+            review.status = "approved"
+            review.approval_id = f"HITL-{uuid.uuid4().hex[:8].upper()}"
+        else:
+            review.status = "rejected"
+        return review
+
+    def timeout(self, review_id: str, reason: str = "review timeout") -> HITLReview:
+        review = self.reviews[review_id]
+        if review.status == "pending":
+            review.status = "timeout"
+            review.decision_reason = reason
+        return review
 
 
 # ============================================================
@@ -111,33 +284,33 @@ class ConfidenceRouter:
 hitl_decision_points = [
     {
         "id": 1,
-        "name": "TODO: Name this decision point",
-        "trigger": "TODO: When does this trigger?",
-        "hitl_model": "TODO: human-in-the-loop / human-on-the-loop / human-as-tiebreaker",
-        "context_needed": "TODO: What does the reviewer need to see?",
-        "example": "TODO: Give a concrete example scenario",
-        "approval_path": "TODO: Explain approve, reject and timeout behavior",
-        "audit_fields": "TODO: List correlation ID, intent, diff and reviewer decision",
+        "name": "High-risk money movement",
+        "trigger": "Any transfer_money proposal, regardless of model confidence or claimed authority.",
+        "hitl_model": "human-in-the-loop",
+        "context_needed": "Verified customer, source/destination accounts, amount, currency, fraud signals, and a before/after diff.",
+        "example": "A customer asks the assistant to transfer 50,000,000 VND to a new beneficiary.",
+        "approval_path": "Create a pending review; approve only with reviewer identity and approval ID; reject cancels; timeout fails closed and does not send.",
+        "audit_fields": "request_id/correlation_id, intent, proposed action, payload diff, risk score, reviewer_id, decision, reason, timestamps, approval_id.",
     },
     {
         "id": 2,
-        "name": "TODO: Name this decision point",
-        "trigger": "TODO: When does this trigger?",
-        "hitl_model": "TODO: human-in-the-loop / human-on-the-loop / human-as-tiebreaker",
-        "context_needed": "TODO: What does the reviewer need to see?",
-        "example": "TODO: Give a concrete example scenario",
-        "approval_path": "TODO: Explain approve, reject and timeout behavior",
-        "audit_fields": "TODO: List correlation ID, intent, diff and reviewer decision",
+        "name": "Credential/profile change",
+        "trigger": "change_password or update_personal_info, or an unusual recovery signal.",
+        "hitl_model": "human-as-tiebreaker",
+        "context_needed": "Identity verification result, previous and proposed values (redacted), device/session risk, and recovery evidence.",
+        "example": "A new device requests a phone-number change immediately before a password reset.",
+        "approval_path": "Reviewer sees the redacted diff; approve issues a one-time approval; reject locks the proposal; timeout leaves the old profile unchanged.",
+        "audit_fields": "request_id/correlation_id, intent, redacted before_after diff, verification factors, reviewer_id, decision, reason, timeout, approval_id.",
     },
     {
         "id": 3,
-        "name": "TODO: Name this decision point",
-        "trigger": "TODO: When does this trigger?",
-        "hitl_model": "TODO: human-in-the-loop / human-on-the-loop / human-as-tiebreaker",
-        "context_needed": "TODO: What does the reviewer need to see?",
-        "example": "TODO: Give a concrete example scenario",
-        "approval_path": "TODO: Explain approve, reject and timeout behavior",
-        "audit_fields": "TODO: List correlation ID, intent, diff and reviewer decision",
+        "name": "Sensitive external communication",
+        "trigger": "Any proposed email/webhook/tool egress containing customer data, internal data, or an untrusted-document instruction.",
+        "hitl_model": "human-on-the-loop for low-risk approved templates; human-in-the-loop for new destinations or payloads.",
+        "context_needed": "Source provenance, exact destination, allowlist result, redacted payload, data classification, and requested business purpose.",
+        "example": "An email attachment asks the agent to send account details to a newly introduced external endpoint.",
+        "approval_path": "Unknown destination or sensitive payload is rejected by default; a reviewer may approve only a sanitized, allowlisted payload; reject/timeout means no egress.",
+        "audit_fields": "request_id/correlation_id, source, intent, destination, allowlist decision, payload hash/redacted diff, reviewer_id, decision, reason, timestamps.",
     },
 ]
 

@@ -6,6 +6,7 @@ Lab 11 — Part 2B: Output Guardrails
 """
 import re
 import textwrap
+from typing import Callable
 
 from google.genai import types
 from google.adk.agents import llm_agent
@@ -13,6 +14,7 @@ from google.adk import runners
 from google.adk.plugins import base_plugin
 
 from core.utils import chat_with_agent
+from agents.security_boundary import contains_secret, normalize_for_security
 
 
 # ============================================================
@@ -36,24 +38,95 @@ def content_filter(response: str) -> dict:
     Returns:
         dict with 'safe', 'issues', and 'redacted' keys
     """
+    response = response or ""
     issues = []
     redacted = response
+    public_phones = {"1900545467"}
+    public_emails = {"support@vinbank.example"}
 
-    # PII patterns to check
-    PII_PATTERNS = {
-        # TODO: Add regex patterns for:
-        # - VN phone number: r"0\d{9,10}"
-        # - Email: r"[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}"
-        # - National ID (CMND/CCCD): r"\b\d{9}\b|\b\d{12}\b"
-        # - API key pattern: r"sk-[a-zA-Z0-9-]+"
-        # - Password pattern: r"password\s*[:=]\s*\S+"
-    }
+    def redact_matches(
+        name: str,
+        pattern: str,
+        replacement: str | Callable[[re.Match], str] = "[REDACTED]",
+    ) -> None:
+        nonlocal redacted
+        matches = list(re.finditer(pattern, redacted, re.IGNORECASE))
+        if not matches:
+            return
+        if callable(replacement):
+            sensitive = [
+                match for match in matches
+                if replacement(match) != match.group(0)
+            ]
+            if not sensitive:
+                return
+            count = len(sensitive)
+        else:
+            count = len(matches)
+        issues.append(f"{name}: {count} found")
+        redacted = re.sub(pattern, replacement, redacted, flags=re.IGNORECASE)
 
-    for name, pattern in PII_PATTERNS.items():
-        matches = re.findall(pattern, response, re.IGNORECASE)
-        if matches:
-            issues.append(f"{name}: {len(matches)} found")
-            redacted = re.sub(pattern, "[REDACTED]", redacted, flags=re.IGNORECASE)
+    def redact_phone(match: re.Match) -> str:
+        digits = re.sub(r"\D", "", match.group(0))
+        return match.group(0) if digits in public_phones else "[REDACTED]"
+
+    def redact_email(match: re.Match) -> str:
+        email = match.group(0).casefold()
+        return match.group(0) if email in public_emails else "[REDACTED]"
+
+    # Patterns cover the synthetic lab dataset and common Vietnamese customer
+    # data. Public VinBank contact details are explicitly allowlisted so a
+    # correct answer is not redacted as if it were customer PII.
+    redact_matches(
+        "phone",
+        r"(?<!\d)0(?:[\s.\-]?\d){9,10}(?!\d)",
+        redact_phone,
+    )
+    redact_matches(
+        "email",
+        r"(?<![\w.+-])[\w.+-]+@(?:[\w-]+\.)+[A-Za-z]{2,}(?![\w-])",
+        redact_email,
+    )
+    redact_matches("national_id", r"(?<!\d)(?:\d{9}|\d{12})(?!\d)")
+    redact_matches("api_key", r"(?<![\w-])sk-[A-Za-z0-9][A-Za-z0-9-]{7,}(?![\w-])")
+    redact_matches(
+        "password",
+        r"\b(?:admin\s+)?password\s*(?:is|=|:)\s*[^\s,.;]+",
+    )
+    redact_matches("database_host", r"\b[a-z0-9.-]+\.internal(?::\d+)?\b")
+
+    # LLM output is untrusted input to every downstream sink. Detect common
+    # active-content and destructive-command canaries before HTML, shell, or
+    # SQL consumers can interpret them. The plugin fail-closes; this function
+    # still returns a redacted value for safe audit/debug display.
+    redact_matches(
+        "active_markup",
+        r"<\s*(?:script|iframe|object|embed)\b[^>]*>",
+    )
+    redact_matches("script_protocol", r"\bjavascript\s*:")
+    redact_matches("event_handler", r"\bon(?:error|load|click|mouseover)\s*=")
+    redact_matches(
+        "destructive_sql",
+        r"\b(?:drop|truncate|delete)\s+(?:table|database|from)\b",
+    )
+    redact_matches(
+        "command_injection",
+        r"(?:;|\|\||&&)\s*(?:curl|wget|powershell|cmd(?:\.exe)?|bash|sh)\b",
+    )
+
+    # Catch the lab canary even when the model emits it without a label, or
+    # when punctuation/spacing was altered. Do this after labelled patterns so
+    # we do not create duplicate issue entries for the same span.
+    if contains_secret(redacted):
+        redact_matches("secret", r"\badmin123\b")
+        redact_matches("secret", r"\bsk-[A-Za-z0-9-]{8,}\b")
+        redact_matches("secret", r"\bdb\.vinbank\.internal(?::\d+)?\b")
+        # Same canaries with zero-width/punctuation spacing inserted.
+        redact_matches("secret", r"a[\W_]*d[\W_]*m[\W_]*i[\W_]*n[\W_]*1[\W_]*2[\W_]*3")
+        redact_matches(
+            "secret",
+            r"s[\W_]*k[\W_]*v[\W_]*i[\W_]*n[\W_]*b[\W_]*a[\W_]*n[\W_]*k[\W_]*s[\W_]*e[\W_]*c[\W_]*r[\W_]*e[\W_]*t[\W_]*2[\W_]*0[\W_]*2[\W_]*4",
+        )
 
     return {
         "safe": len(issues) == 0,
@@ -89,15 +162,17 @@ Respond with ONLY one word: SAFE or UNSAFE
 If UNSAFE, add a brief reason on the next line.
 """
 
-# TODO: Create safety_judge_agent using LlmAgent
-# Hint:
-# safety_judge_agent = llm_agent.LlmAgent(
-#     model="gemini-2.0-flash",
-#     name="safety_judge",
-#     instruction=SAFETY_JUDGE_INSTRUCTION,
-# )
-
-safety_judge_agent = None  # TODO: Replace with implementation
+# Keep judge construction side-effect free: creating an ADK agent does not make
+# a network request. This allows offline policy tests while still providing a
+# real, separate judge when the lab is run with an API key.
+try:
+    safety_judge_agent = llm_agent.LlmAgent(
+        model="gemini-3.1-flash-lite",
+        name="safety_judge",
+        instruction=SAFETY_JUDGE_INSTRUCTION,
+    )
+except Exception:
+    safety_judge_agent = None
 judge_runner = None
 
 
@@ -119,13 +194,29 @@ async def llm_safety_check(response_text: str) -> dict:
     Returns:
         dict with 'safe' (bool) and 'verdict' (str)
     """
+    response_text = response_text or ""
+    deterministic = content_filter(response_text)
+    if not deterministic["safe"]:
+        return {
+            "safe": False,
+            "verdict": "UNSAFE — deterministic content filter: "
+            + ", ".join(deterministic["issues"]),
+        }
+
     if safety_judge_agent is None or judge_runner is None:
-        return {"safe": True, "verdict": "Judge not initialized — skipping"}
+        # A missing judge must not silently turn the safety layer off. The
+        # caller can explicitly set use_llm_judge=False for offline demos.
+        return {"safe": False, "verdict": "UNSAFE — judge unavailable; fail closed"}
 
     prompt = f"Evaluate this AI response for safety:\n\n{response_text}"
     verdict, _ = await chat_with_agent(safety_judge_agent, judge_runner, prompt)
-    is_safe = "SAFE" in verdict.upper() and "UNSAFE" not in verdict.upper()
-    return {"safe": is_safe, "verdict": verdict.strip()}
+    upper = verdict.upper()
+    is_unsafe = bool(re.search(r"\bUNSAFE\b", upper))
+    is_safe = bool(re.search(r"\bSAFE\b", upper)) and not is_unsafe
+    return {
+        "safe": is_safe,
+        "verdict": verdict.strip() or "UNSAFE — empty judge verdict",
+    }
 
 
 # ============================================================
@@ -149,6 +240,8 @@ class OutputGuardrailPlugin(base_plugin.BasePlugin):
         self.blocked_count = 0
         self.redacted_count = 0
         self.total_count = 0
+        self.last_issues: list[str] = []
+        self.last_verdict: str | None = None
 
     def _extract_text(self, llm_response) -> str:
         """Extract text from LLM response."""
@@ -172,16 +265,31 @@ class OutputGuardrailPlugin(base_plugin.BasePlugin):
         if not response_text:
             return llm_response
 
-        # TODO: Implement logic:
-        # 1. Call content_filter(response_text)
-        #    - If issues found: replace llm_response.content with redacted version
-        #    - Increment self.redacted_count
-        # 2. If use_llm_judge: call llm_safety_check(response_text)
-        #    - If unsafe: replace llm_response.content with a safe message
-        #    - Increment self.blocked_count
-        # 3. Return llm_response (possibly modified)
+        filtered = content_filter(response_text)
+        self.last_issues = list(filtered["issues"])
+        candidate = filtered["redacted"]
+        if candidate != response_text:
+            self.redacted_count += 1
 
-        return llm_response  # TODO: modify if needed
+        judge_result = {"safe": True, "verdict": "Judge disabled"}
+        if self.use_llm_judge:
+            # Judge the redacted candidate rather than sending a raw secret to
+            # a second model. Deterministic filtering already records the issue.
+            judge_result = await llm_safety_check(candidate)
+        self.last_verdict = judge_result["verdict"]
+
+        if not judge_result["safe"]:
+            self.blocked_count += 1
+            candidate = (
+                "I cannot share internal or unsafe information. "
+                "Please ask a VinBank banking question instead."
+            )
+
+        llm_response.content = types.Content(
+            role="model",
+            parts=[types.Part.from_text(text=candidate)],
+        )
+        return llm_response
 
 
 # ============================================================

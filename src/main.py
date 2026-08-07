@@ -16,6 +16,14 @@ import argparse
 from core.config import setup_api_key
 
 
+# Windows consoles can default to cp1252, while the lab deliberately prints
+# Vietnamese text and Unicode status markers. Reconfigure only the text
+# wrappers so CLI diagnostics do not fail before the actual pipeline starts.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 async def part1_attacks():
     """Hạng mục B: attack unsafe agent, then try guards agent (điểm cộng)."""
     print("\n" + "=" * 60)
